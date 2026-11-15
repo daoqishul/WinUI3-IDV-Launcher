@@ -51,10 +51,16 @@
 
 ## 从源码构建
 
-需要 .NET 8 SDK：
+使用 Visual Studio 打开：
+
+```text
+WinUI3-IDV-Launcher.sln
+```
+
+或使用 .NET 8 SDK 命令行：
 
 ```powershell
-dotnet build .\winui\IdvLauncher.csproj -c Release -p:Platform=x64
+dotnet build .\WinUI3-IDV-Launcher.sln -c Release -p:Platform=x64
 ```
 
 或生成便携包：
@@ -73,6 +79,7 @@ IDVLauncher-WinUI3-v1.0.4-win64.zip
 ## 项目结构
 
 ```text
+WinUI3-IDV-Launcher.sln Visual Studio 解决方案
 winui/                  WinUI 3 主程序
   Pages/                首页、账号、云存档、引擎、键位、解帧、设置
   Services/             引擎、API、云同步、游戏设置、键位、托盘
