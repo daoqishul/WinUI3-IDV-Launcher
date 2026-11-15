@@ -1,0 +1,42 @@
+# Build output
+winui/bin/
+winui/obj/
+dist/
+installer/
+_inno_portable/
+_installtest/
+_source_stage/
+
+# Bundled third-party engine / local install payload
+engine-payload/
+engine/
+
+# Archives and logs
+*.zip
+*.log
+*.tmp
+*.bak
+*.pdb
+
+# IDE / user files
+.vs/
+*.user
+*.suo
+*.userprefs
+
+# Local settings / test data
+config-copy.json
+opMap-fixed.json
+opMap.json
+_gametest/
+_favoritetest/
+_configtest/
+_engine_src2/
+_ldrtest/
+exe-icon-check.png
+icon-dark-check.png
+icon-dark-small.png
+keytool-*.png
+setup-manifest*.xml
+sm.xml
+/tp.png

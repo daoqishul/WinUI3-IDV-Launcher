@@ -1,0 +1,213 @@
+<Page
+    x:Class="IdvLauncher.Pages.KeyBindingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="using:IdvLauncher.Models"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="Transparent">
+
+    <Grid x:Name="RootGrid" Padding="24,14,24,18" RowSpacing="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Spacing="10">
+            <Button Click="OnBack" Padding="8" VerticalAlignment="Center">
+                <FontIcon Glyph="&#xE72B;" FontSize="14" />
+            </Button>
+            <StackPanel>
+                <TextBlock Text="键位设置" Style="{StaticResource PageTitleStyle}" />
+                <TextBlock Text="点击按键后按新按键，支持 A + B + C 组合，Enter 确认；Esc 取消"
+                           Style="{StaticResource PageSubtitleStyle}" />
+            </StackPanel>
+        </StackPanel>
+
+        <Grid Grid.Row="1" ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="KeyConfigPathText"
+                       Text="按键配置文件：查询中…"
+                       VerticalAlignment="Center"
+                       FontSize="11.5"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                       TextTrimming="CharacterEllipsis" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                <Button Content="选择目录" Click="OnBrowsePath" />
+                <Button Content="自动查询" Click="OnDiscoverPath" />
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="2" ColumnSpacing="6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="ManualPathBox"
+                     PlaceholderText="也可以直接粘贴 pc_key_setting_data.json 路径"
+                     FontSize="11" />
+            <Button Grid.Column="1"
+                    Content="使用此路径"
+                    Click="OnUseManualPath" />
+        </Grid>
+
+        <Grid Grid.Row="3" ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="250" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal" Spacing="4">
+                <ToggleButton x:Name="TabGeneral" Tag="通用" Content="通用" IsChecked="True" Click="OnTabClick" />
+                <ToggleButton x:Name="TabSurvivor" Tag="求生者" Content="求生者" Click="OnTabClick" />
+                <ToggleButton x:Name="TabHunter" Tag="监管者" Content="监管者" Click="OnTabClick" />
+                <ToggleButton x:Name="TabNotebook" Tag="加页手记" Content="加页手记" Click="OnTabClick" />
+                <ToggleButton x:Name="TabOther" Tag="其他模式" Content="其他模式" Click="OnTabClick" />
+            </StackPanel>
+
+            <AutoSuggestBox x:Name="SearchBox"
+                            Grid.Column="2"
+                            Width="250"
+                            HorizontalAlignment="Right"
+                            PlaceholderText="搜索角色 / 动作 / 按键"
+                            TextMemberPath="Display"
+                            TextChanged="OnSearchTextChanged"
+                            SuggestionChosen="OnSuggestionChosen"
+                            QuerySubmitted="OnSearchSubmitted">
+                <AutoSuggestBox.QueryIcon>
+                    <FontIcon Glyph="&#xE721;" />
+                </AutoSuggestBox.QueryIcon>
+            </AutoSuggestBox>
+        </Grid>
+
+        <ScrollViewer x:Name="KeyScroll"
+                      Grid.Row="4"
+                      VerticalScrollBarVisibility="Auto"
+                      VerticalScrollMode="Enabled"
+                      HorizontalScrollBarVisibility="Disabled"
+                      HorizontalScrollMode="Disabled"
+                      PointerWheelChanged="OnKeyScrollWheel">
+            <StackPanel Spacing="8">
+                <Border x:Name="KeyListBorder"
+                        BorderBrush="Transparent"
+                        BorderThickness="2"
+                        CornerRadius="7">
+                    <ItemsRepeater x:Name="KeyRepeater">
+                        <ItemsRepeater.Layout>
+                            <UniformGridLayout ItemsStretch="Fill"
+                                               MaximumRowsOrColumns="2"
+                                               MinItemWidth="350"
+                                               MinItemHeight="44"
+                                               MinColumnSpacing="10"
+                                               MinRowSpacing="6" />
+                        </ItemsRepeater.Layout>
+                        <ItemsRepeater.ItemTemplate>
+                            <DataTemplate x:DataType="models:KeyBindingRow">
+                                <Border BorderThickness="1"
+                                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                        CornerRadius="7">
+                                    <Grid ColumnSpacing="10" Padding="8,2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="130" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{x:Bind Name}"
+                                                   FontSize="12.5"
+                                                   VerticalAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <Button Grid.Column="1"
+                                                Content="{x:Bind KeyDisplay, Mode=OneWay}"
+                                                Tag="{x:Bind Op}"
+                                                MinWidth="120"
+                                                Padding="8,3"
+                                                FontSize="11.5"
+                                                Click="OnKeyButtonClick" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsRepeater.ItemTemplate>
+                    </ItemsRepeater>
+                </Border>
+
+                <Border x:Name="RolePanel"
+                        Visibility="Collapsed"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="10">
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="专属" Style="{StaticResource CardTitleStyle}" />
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="选择角色:"
+                                       VerticalAlignment="Center"
+                                       FontSize="11.5" />
+                            <ComboBox x:Name="RoleCombo"
+                                      Width="200"
+                                      SelectionChanged="OnRoleChanged" />
+                        </StackPanel>
+                        <ItemsRepeater x:Name="RoleKeyRepeater">
+                            <ItemsRepeater.Layout>
+                                <UniformGridLayout ItemsStretch="Fill"
+                                                   MaximumRowsOrColumns="2"
+                                                   MinItemWidth="350"
+                                                   MinItemHeight="44"
+                                                   MinColumnSpacing="10"
+                                                   MinRowSpacing="6" />
+                            </ItemsRepeater.Layout>
+                            <ItemsRepeater.ItemTemplate>
+                                <DataTemplate x:DataType="models:KeyBindingRow">
+                                    <Border BorderThickness="1"
+                                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                            CornerRadius="7">
+                                        <Grid ColumnSpacing="10" Padding="8,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="130" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{x:Bind Name}"
+                                                       FontSize="12.5"
+                                                       VerticalAlignment="Center"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <Button Grid.Column="1"
+                                                    Content="{x:Bind KeyDisplay, Mode=OneWay}"
+                                                    Tag="{x:Bind Op}"
+                                                    MinWidth="120"
+                                                    Padding="8,3"
+                                                    FontSize="11.5"
+                                                    Click="OnKeyButtonClick" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsRepeater.ItemTemplate>
+                        </ItemsRepeater>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="5" Orientation="Horizontal" Spacing="10">
+            <TextBlock x:Name="StatusText"
+                       Text="读取键位中…"
+                       VerticalAlignment="Center"
+                       Style="{StaticResource SettingDescriptionStyle}" />
+            <TextBox x:Name="CaptureBox"
+                     Width="150"
+                     Header="新按键"
+                     IsReadOnly="True"
+                     Visibility="Collapsed"
+                     KeyDown="OnCaptureBoxKeyDown" />
+            <Button x:Name="ConfirmKeyButton"
+                    Content="确认修改（Enter）"
+                    Visibility="Collapsed"
+                    Click="OnConfirmKey" />
+        </StackPanel>
+    </Grid>
+</Page>

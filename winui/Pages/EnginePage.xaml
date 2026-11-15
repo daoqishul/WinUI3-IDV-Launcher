@@ -1,0 +1,225 @@
+<Page
+    x:Class="IdvLauncher.Pages.EnginePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:IdvLauncher.Models"
+    mc:Ignorable="d"
+    Background="Transparent">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled"
+                  HorizontalScrollMode="Disabled"
+                  HorizontalContentAlignment="Stretch">
+        <Grid Padding="24,14,24,18">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <StackPanel>
+                <TextBlock Text="登录引擎" Style="{StaticResource PageTitleStyle}" />
+                <TextBlock Text="渠道服登录服务 · 由启动器自动管理"
+                           Style="{StaticResource PageSubtitleStyle}" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Margin="0,12,0,0" Spacing="12">
+                <InfoBar x:Name="EngineInfo"
+                         IsOpen="False"
+                         IsClosable="True"
+                         Severity="Informational" />
+
+                <Border Style="{StaticResource CardStyle}">
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Spacing="8">
+                            <StackPanel Orientation="Horizontal" Spacing="9" VerticalAlignment="Center">
+                                <Ellipse x:Name="StatusDot"
+                                         Width="9"
+                                         Height="9"
+                                         Fill="{ThemeResource TextFillColorTertiaryBrush}" />
+                                <TextBlock x:Name="StatusText"
+                                           Text="登录引擎未启动"
+                                           FontSize="15"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center" />
+                                <Border x:Name="StateBadge"
+                                        Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                        CornerRadius="8"
+                                        Padding="8,2"
+                                        VerticalAlignment="Center">
+                                    <TextBlock x:Name="StateBadgeText"
+                                               Text="未运行"
+                                               FontSize="10"
+                                               Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                                </Border>
+                            </StackPanel>
+                            <TextBlock Text="登录服务随启动器自动开启和关闭；退出启动器时会自动清理网络配置。"
+                                       Style="{StaticResource SettingDescriptionStyle}" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1"
+                                    Orientation="Horizontal"
+                                    Spacing="8"
+                                    VerticalAlignment="Center">
+                            <Button x:Name="AccountsButton"
+                                    Content="账号管理"
+                                    Click="OnOpenAccounts" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.08*" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel Spacing="12">
+                            <Grid ColumnSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE713;" FontSize="16" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                                    <TextBlock Text="登录配置" Style="{StaticResource CardTitleStyle}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
+                                    <Button Content="保存配置" Click="OnSaveConfig" />
+                                </StackPanel>
+                            </Grid>
+                            <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                            <ComboBox x:Name="ProxyModeCombo"
+                                      Header="代理模式"
+                                      HorizontalAlignment="Stretch">
+                                <ComboBoxItem Content="兼容模式（DNS 劫持，推荐）" Tag="compat" />
+                                <ComboBoxItem Content="进程代理（只影响启动的游戏）" Tag="process" />
+                                <ComboBoxItem Content="全局代理（影响整台电脑）" Tag="global" />
+                            </ComboBox>
+
+                            <ComboBox x:Name="AccountCombo"
+                                      Header="默认渠道账号"
+                                      HorizontalAlignment="Stretch"
+                                      DisplayMemberPath="Display"
+                                      SelectedValuePath="Uuid"
+                                      PlaceholderText="读取中…" />
+
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="登录延迟" Style="{StaticResource SettingLabelStyle}" />
+                                    <TextBlock Text="游戏请求到达后等待多少秒再填入账号"
+                                               Style="{StaticResource SettingDescriptionStyle}" />
+                                </StackPanel>
+                                <NumberBox x:Name="LoginDelayBox"
+                                           Grid.Column="1"
+                                           Width="120"
+                                           Minimum="0"
+                                           Maximum="30"
+                                           SmallChange="1"
+                                           SpinButtonPlacementMode="Compact"
+                                           VerticalAlignment="Center" />
+                            </Grid>
+
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="登录后自动关闭引擎" Style="{StaticResource SettingLabelStyle}" />
+                                    <TextBlock Text="进入游戏后自动停止并清理 DNS/代理"
+                                               Style="{StaticResource SettingDescriptionStyle}" />
+                                </StackPanel>
+                                <ToggleSwitch x:Name="AutoCloseToggle"
+                                              Grid.Column="1"
+                                              VerticalAlignment="Center"
+                                              OnContent=""
+                                              OffContent="" />
+                            </Grid>
+
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="自动扫码登录" Style="{StaticResource SettingLabelStyle}" />
+                                    <TextBlock Text="开启后自动登录当前账号；关闭后进入游戏内置登录界面手动选号"
+                                               Style="{StaticResource SettingDescriptionStyle}" />
+                                </StackPanel>
+                                <ToggleSwitch x:Name="AutoScanToggle"
+                                              Grid.Column="1"
+                                              VerticalAlignment="Center"
+                                              OnContent=""
+                                              OffContent=""
+                                              Toggled="OnAutoScanToggled" />
+                            </Grid>
+
+                            <TextBlock x:Name="RestartNeededText"
+                                       Text="配置已保存；下次启动游戏时自动应用。"
+                                       Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+                                       FontSize="11.5"
+                                       Visibility="Collapsed" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" Style="{StaticResource CardStyle}">
+                        <StackPanel Spacing="12">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE7FC;" FontSize="16" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                                <TextBlock Text="游戏与启动" Style="{StaticResource CardTitleStyle}" />
+                            </StackPanel>
+                            <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                            <TextBox x:Name="GamePathBox"
+                                     Header="游戏路径（在设置中修改）"
+                                     IsReadOnly="True"
+                                     PlaceholderText="D:\dwrg\dwrg.exe" />
+
+
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <Border Style="{StaticResource CardStyle}">
+                    <StackPanel Spacing="10">
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE9D9;" FontSize="16" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                                <TextBlock Text="引擎日志" Style="{StaticResource CardTitleStyle}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                <Button Content="刷新日志" Click="OnRefreshLog" />
+                                <Button Content="查看完整日志" Click="OnOpenLog" />
+                            </StackPanel>
+                        </Grid>
+                        <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                        <TextBlock x:Name="LogText"
+                                   Text="尚无日志。启动引擎后这里显示 log.txt 的尾部。"
+                                   FontFamily="Consolas"
+                                   FontSize="10.5"
+                                   TextWrapping="Wrap"
+                                   MaxHeight="190"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</Page>

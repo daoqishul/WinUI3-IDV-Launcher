@@ -1,0 +1,75 @@
+<ContentDialog
+    x:Class="IdvLauncher.Dialogs.KeyBindingDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="using:IdvLauncher.Models"
+    Title="键位编辑器"
+    PrimaryButtonText="关闭"
+    DefaultButton="Primary"
+    Opened="OnOpened">
+
+    <Grid Width="760" Height="520" RowSpacing="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid ColumnSpacing="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="220" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="分类" VerticalAlignment="Center" />
+            <ComboBox x:Name="CategoryCombo"
+                      Grid.Column="1"
+                      DisplayMemberPath="Name"
+                      SelectionChanged="OnCategoryChanged" />
+            <TextBlock x:Name="StatusText"
+                       Grid.Column="2"
+                       VerticalAlignment="Center"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                       TextTrimming="CharacterEllipsis" />
+        </Grid>
+
+        <ListView x:Name="ActionsList"
+                  Grid.Row="1"
+                  SelectionMode="Single"
+                  HorizontalContentAlignment="Stretch"
+                  SelectionChanged="OnActionChanged"
+                  BorderThickness="1"
+                  BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                  CornerRadius="8">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="models:KeyBindingRow">
+                    <TextBlock Text="{x:Bind Display, Mode=OneWay}"
+                               FontSize="12.5"
+                               Padding="4,3" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <TextBlock x:Name="SelectedActionText"
+                   Grid.Row="2"
+                   Text="请选择一个动作"
+                   Style="{StaticResource SettingDescriptionStyle}" />
+
+        <Grid Grid.Row="3" ColumnSpacing="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <ComboBox x:Name="KeyCombo"
+                      Header="新按键"
+                      DisplayMemberPath="Name"
+                      HorizontalAlignment="Stretch" />
+            <Button x:Name="ApplyButton"
+                    Grid.Column="1"
+                    Content="应用按键"
+                    VerticalAlignment="Bottom"
+                    Click="OnApply" />
+        </Grid>
+    </Grid>
+</ContentDialog>

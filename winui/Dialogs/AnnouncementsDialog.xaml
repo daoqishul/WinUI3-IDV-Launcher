@@ -1,0 +1,33 @@
+<UserControl
+    x:Class="IdvLauncher.Dialogs.AnnouncementsDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <StackPanel Spacing="12" MinWidth="560">
+        <Grid>
+            <StackPanel Spacing="2">
+                <TextBlock Text="游戏公告" FontSize="20" FontWeight="SemiBold" />
+                <TextBlock Text="本地公告源 · 可在设置中编辑或刷新"
+                           FontSize="11.5"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+            <Button Style="{StaticResource IconButtonStyle}"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Click="OnClose">
+                <FontIcon Glyph="&#xE711;" FontSize="13" />
+            </Button>
+        </Grid>
+        <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+        <ScrollViewer MaxHeight="520" VerticalScrollBarVisibility="Auto">
+            <StackPanel x:Name="ListPanel" Spacing="18" Padding="0,4,8,4" />
+        </ScrollViewer>
+        <Button Content="关闭"
+                HorizontalAlignment="Right"
+                Style="{StaticResource PrimaryButtonStyle}"
+                Click="OnClose" />
+    </StackPanel>
+</UserControl>

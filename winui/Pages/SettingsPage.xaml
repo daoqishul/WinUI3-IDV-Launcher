@@ -1,0 +1,531 @@
+<Page
+    x:Class="IdvLauncher.Pages.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="Transparent">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" HorizontalScrollMode="Disabled" HorizontalContentAlignment="Stretch">
+        <Grid Padding="24,14,24,18">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <StackPanel>
+                <TextBlock Text="设置" Style="{StaticResource PageTitleStyle}" />
+                <TextBlock Text="游戏路径、窗口与个性化" Style="{StaticResource PageSubtitleStyle}" />
+            </StackPanel>
+
+            <Grid Grid.Row="1" Margin="0,12,0,0" ColumnSpacing="14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.18*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Spacing="12">
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel Spacing="14">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE7FC;" FontSize="16" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                                <TextBlock Text="游戏设置" Style="{StaticResource CardTitleStyle}" />
+                            </StackPanel>
+                            <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                            <Grid ColumnSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="QualityLowButton"
+                                        Tag="0"
+                                        Padding="0"
+                                        HorizontalContentAlignment="Stretch"
+                                        Background="Transparent"
+                                        BorderThickness="2"
+                                        BorderBrush="Transparent"
+                                        CornerRadius="10"
+                                        Click="OnQualityCardClick">
+                                    <StackPanel Spacing="5">
+                                        <Image Source="ms-appx:///Assets/game-quality-low.png"
+                                               Height="76"
+                                               HorizontalAlignment="Stretch"
+                                               Stretch="UniformToFill" />
+                                        <TextBlock Text="性能" HorizontalAlignment="Center" FontSize="12" />
+                                    </StackPanel>
+                                </Button>
+                                <Button x:Name="QualityMidButton"
+                                        Grid.Column="1"
+                                        Tag="1"
+                                        Padding="0"
+                                        HorizontalContentAlignment="Stretch"
+                                        Background="Transparent"
+                                        BorderThickness="2"
+                                        BorderBrush="Transparent"
+                                        CornerRadius="10"
+                                        Click="OnQualityCardClick">
+                                    <StackPanel Spacing="5">
+                                        <Image Source="ms-appx:///Assets/game-quality-mid.png"
+                                               Height="76"
+                                               HorizontalAlignment="Stretch"
+                                               Stretch="UniformToFill" />
+                                        <TextBlock Text="效率" HorizontalAlignment="Center" FontSize="12" />
+                                    </StackPanel>
+                                </Button>
+                                <Button x:Name="QualityHighButton"
+                                        Grid.Column="2"
+                                        Tag="2"
+                                        Padding="0"
+                                        HorizontalContentAlignment="Stretch"
+                                        Background="Transparent"
+                                        BorderThickness="2"
+                                        BorderBrush="Transparent"
+                                        CornerRadius="10"
+                                        Click="OnQualityCardClick">
+                                    <StackPanel Spacing="5">
+                                        <Image Source="ms-appx:///Assets/game-quality-high.png"
+                                               Height="76"
+                                               HorizontalAlignment="Stretch"
+                                               Stretch="UniformToFill" />
+                                        <TextBlock Text="精美" HorizontalAlignment="Center" FontSize="12" />
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+
+                            <TextBlock x:Name="QualitySelectionText"
+                                       Text="当前画质：精美"
+                                       Style="{StaticResource SettingDescriptionStyle}" />
+
+                            <Border BorderThickness="1"
+                                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                    CornerRadius="8"
+                                    Padding="8">
+                                <Grid ColumnSpacing="12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="200" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Image Source="ms-appx:///Assets/game-emulator-mode.png"
+                                           Height="66"
+                                           Stretch="UniformToFill"
+                                           VerticalAlignment="Center" />
+                                    <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                                        <ComboBox x:Name="PcModeCombo"
+                                                  Header="PC 模拟器模式"
+                                                  HorizontalAlignment="Stretch"
+                                                  SelectionChanged="OnPcModeChanged">
+                                            <ComboBoxItem Content="兼容模式" Tag="0" />
+                                            <ComboBoxItem Content="流畅模式" Tag="1" />
+                                        </ComboBox>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="画面精度" Style="{StaticResource SettingLabelStyle}" />
+                                <TextBlock Text="画面精度越高，实际画面表现越清晰，可能会加快设备耗电、发热"
+                                           Style="{StaticResource SettingDescriptionStyle}" />
+                                <ComboBox x:Name="ResolutionScaleCombo" HorizontalAlignment="Stretch"
+                                          SelectionChanged="OnGameComboChanged">
+                                    <ComboBoxItem Content="0.5" Tag="1" />
+                                    <ComboBoxItem Content="0.6" Tag="2" />
+                                    <ComboBoxItem Content="0.7" Tag="3" />
+                                    <ComboBoxItem Content="0.8" Tag="4" />
+                                    <ComboBoxItem Content="1.0" Tag="5" />
+                                </ComboBox>
+                            </StackPanel>
+
+                            <ComboBox x:Name="GameDisplayCombo"
+                                      Header="显示模式"
+                                      HorizontalAlignment="Stretch"
+                                      SelectionChanged="OnGameComboChanged">
+                                <ComboBoxItem Content="全屏" Tag="1" />
+                                <ComboBoxItem Content="窗口化" Tag="0" />
+                            </ComboBox>
+
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="高帧率模式 - 战斗内" Style="{StaticResource SettingLabelStyle}" />
+                                    <TextBlock Text="开启后画面更流畅，可能会加快设备耗电、发热"
+                                               Style="{StaticResource SettingDescriptionStyle}" />
+                                </StackPanel>
+                                <ToggleSwitch x:Name="HighFpsBattleToggle"
+                                              Grid.Column="1"
+                                              VerticalAlignment="Center"
+                                              OnContent=""
+                                              OffContent=""
+                                              Toggled="OnGameSettingChanged" />
+                            </Grid>
+
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="高帧率模式 - 战斗外" Style="{StaticResource SettingLabelStyle}" />
+                                    <TextBlock Text="开启后画面更流畅，可能会加快设备耗电、发热"
+                                               Style="{StaticResource SettingDescriptionStyle}" />
+                                </StackPanel>
+                                <ToggleSwitch x:Name="HighFpsOutBattleToggle"
+                                              Grid.Column="1"
+                                              VerticalAlignment="Center"
+                                              OnContent=""
+                                              OffContent=""
+                                              Toggled="OnGameSettingChanged" />
+                            </Grid>
+
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="抗锯齿" Style="{StaticResource SettingLabelStyle}" />
+                                    <TextBlock Text="开启后可减少大厅和战斗场景中的模型锯齿"
+                                               Style="{StaticResource SettingDescriptionStyle}" />
+                                </StackPanel>
+                                <ToggleSwitch x:Name="AntiAliasToggle"
+                                              Grid.Column="1"
+                                              VerticalAlignment="Center"
+                                              OnContent=""
+                                              OffContent=""
+                                              Toggled="OnGameSettingChanged" />
+                            </Grid>
+
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="战斗内帧率检测" Style="{StaticResource SettingLabelStyle}" />
+                                    <TextBlock Text="关闭后帧率过低时不会提示降低画质"
+                                               Style="{StaticResource SettingDescriptionStyle}" />
+                                </StackPanel>
+                                <ToggleSwitch x:Name="FrameCheckToggle"
+                                              Grid.Column="1"
+                                              VerticalAlignment="Center"
+                                              OnContent=""
+                                              OffContent=""
+                                              Toggled="OnGameSettingChanged" />
+                            </Grid>
+
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="战斗内视野范围" Style="{StaticResource SettingLabelStyle}" />
+                                <TextBlock Text="长宽比小于 16:9 的设备可切换战斗内的视野范围，新进战斗后生效"
+                                           Style="{StaticResource SettingDescriptionStyle}" />
+                                <ComboBox x:Name="FovCombo" HorizontalAlignment="Stretch"
+                                          SelectionChanged="OnGameComboChanged">
+                                    <ComboBoxItem Content="经典" Tag="0" />
+                                    <ComboBoxItem Content="宽阔" Tag="1" />
+                                </ComboBox>
+                            </StackPanel>
+
+                            <TextBlock x:Name="GameSettingsHint"
+                                       Text="读取游戏设置中…"
+                                       Style="{StaticResource SettingDescriptionStyle}" />
+
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button x:Name="ApplyGameSettingsButton"
+                                        Content="应用游戏设置"
+                                        Click="OnApplyGameSettings" />
+                                <Button Content="编辑键位"
+                                        Click="OnOpenKeyEditor" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel Spacing="14">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE7FC;" FontSize="16" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                                <TextBlock Text="游戏与启动" Style="{StaticResource CardTitleStyle}" />
+                            </StackPanel>
+                            <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="游戏路径" Style="{StaticResource SettingLabelStyle}" />
+                                    <TextBlock x:Name="GamePathText"
+                                               Text="尚未设置"
+                                               Style="{StaticResource SettingDescriptionStyle}"
+                                               TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <Button Content="浏览" Click="OnBrowseGame" />
+                                    <Button Content="检测" Click="OnDetectGame" />
+                                </StackPanel>
+                            </Grid>
+
+                            <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="启动后最小化" Style="{StaticResource SettingLabelStyle}" />
+                                    <TextBlock Text="游戏启动后自动收起启动器" Style="{StaticResource SettingDescriptionStyle}" />
+                                </StackPanel>
+                                <ToggleSwitch x:Name="MinimizeToggle"
+                                              Grid.Column="1"
+                                              VerticalAlignment="Center"
+                                              OnContent=""
+                                              OffContent=""
+                                              Toggled="OnMinimizeToggled" />
+                            </Grid>
+
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="启动后退出" Style="{StaticResource SettingLabelStyle}" />
+                                    <TextBlock Text="游戏启动后关闭启动器（登录时改为最小化）"
+                                               Style="{StaticResource SettingDescriptionStyle}" />
+                                </StackPanel>
+                                <ToggleSwitch x:Name="CloseToggle"
+                                              Grid.Column="1"
+                                              VerticalAlignment="Center"
+                                              OnContent=""
+                                              OffContent=""
+                                              Toggled="OnCloseToggled" />
+                            </Grid>
+
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="启动等待" Style="{StaticResource SettingLabelStyle}" />
+                                    <TextBlock Text="点击启动后延迟运行游戏（秒）" Style="{StaticResource SettingDescriptionStyle}" />
+                                </StackPanel>
+                                <NumberBox x:Name="DelayBox"
+                                           Grid.Column="1"
+                                           Width="130"
+                                           Minimum="0"
+                                           Maximum="30"
+                                           SmallChange="1"
+                                           SpinButtonPlacementMode="Compact"
+                                           VerticalAlignment="Center"
+                                           ValueChanged="OnDelayChanged" />
+                            </Grid>
+
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="使用登录引擎" Style="{StaticResource SettingLabelStyle}" />
+                                    <TextBlock Text="由启动器自动启动并隐藏登录服务"
+                                               Style="{StaticResource SettingDescriptionStyle}" />
+                                </StackPanel>
+                                <ToggleSwitch x:Name="EngineToggle"
+                                              Grid.Column="1"
+                                              VerticalAlignment="Center"
+                                              OnContent=""
+                                              OffContent=""
+                                              Toggled="OnEngineToggled" />
+                            </Grid>
+
+                            <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="记住窗口大小" Style="{StaticResource SettingLabelStyle}" />
+                                    <TextBlock Text="关闭后每次启动固定 1268×690"
+                                               Style="{StaticResource SettingDescriptionStyle}" />
+                                </StackPanel>
+                                <ToggleSwitch x:Name="RememberBoundsToggle"
+                                              Grid.Column="1"
+                                              VerticalAlignment="Center"
+                                              OnContent=""
+                                              OffContent=""
+                                              Toggled="OnRememberBoundsToggled" />
+                            </Grid>
+
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="小托盘" Style="{StaticResource SettingLabelStyle}" />
+                                    <TextBlock Text="关闭窗口时隐藏到系统托盘，右键托盘退出"
+                                               Style="{StaticResource SettingDescriptionStyle}" />
+                                </StackPanel>
+                                <ToggleSwitch x:Name="TrayToggle"
+                                              Grid.Column="1"
+                                              VerticalAlignment="Center"
+                                              OnContent=""
+                                              OffContent=""
+                                              Toggled="OnTrayToggled" />
+                            </Grid>
+
+                            <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="下载游戏" Style="{StaticResource SettingLabelStyle}" />
+                                    <TextBlock Text="打开 PC 互通版下载 / 安装说明页面"
+                                               Style="{StaticResource SettingDescriptionStyle}" />
+                                </StackPanel>
+                                <Button Grid.Column="1"
+                                        Content="打开下载页"
+                                        VerticalAlignment="Center"
+                                        Click="OnDownloadGame" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel Spacing="14">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE790;" FontSize="16" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                                <TextBlock Text="个性化" Style="{StaticResource CardTitleStyle}" />
+                            </StackPanel>
+                            <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                            <ComboBox x:Name="ThemeCombo" Header="颜色模式" HorizontalAlignment="Stretch" SelectionChanged="OnThemeChanged">
+                                <ComboBoxItem Content="跟随系统" Tag="0" />
+                                <ComboBoxItem Content="深色（黑）" Tag="1" />
+                                <ComboBoxItem Content="浅色（白）" Tag="2" />
+                            </ComboBox>
+
+                            <ComboBox x:Name="BackdropCombo" Header="全局背景" HorizontalAlignment="Stretch" SelectionChanged="OnBackdropChanged">
+                                <ComboBoxItem Content="纯色" Tag="0" />
+                                <ComboBoxItem Content="云母 Mica" Tag="1" />
+                                <ComboBoxItem Content="亚克力 Acrylic" Tag="2" />
+                            </ComboBox>
+
+                            <ComboBox x:Name="CornerCombo" Header="界面圆角" HorizontalAlignment="Stretch" SelectionChanged="OnCornerChanged">
+                                <ComboBoxItem Content="圆角" Tag="0" />
+                                <ComboBoxItem Content="直角" Tag="1" />
+                            </ComboBox>
+
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="侧边栏默认折叠" Style="{StaticResource SettingLabelStyle}" />
+                                    <TextBlock Text="收起左侧导航，只保留图标" Style="{StaticResource SettingDescriptionStyle}" />
+                                </StackPanel>
+                                <ToggleSwitch x:Name="SidebarToggle"
+                                              Grid.Column="1"
+                                              VerticalAlignment="Center"
+                                              OnContent=""
+                                              OffContent=""
+                                              Toggled="OnSidebarToggled" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Spacing="12">
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel Spacing="10">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE72E;" FontSize="16" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                                <TextBlock Text="免责声明" Style="{StaticResource CardTitleStyle}" />
+                            </StackPanel>
+                            <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                            <TextBlock Text="本软件为非官方工具，使用可能带来账号封禁等风险，请自行承担后果。"
+                                       FontSize="11"
+                                       TextWrapping="Wrap"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <Button Content="查看完整免责声明"
+                                    HorizontalAlignment="Left"
+                                    Click="OnShowDisclaimer" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource CardStyle}">
+                        <Expander HorizontalAlignment="Stretch" IsExpanded="False">
+                            <Expander.Header>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE8C7;" FontSize="16"
+                                              Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                                    <TextBlock Text="想要更新快一点？来赞助吧！"
+                                               FontSize="14"
+                                               FontWeight="SemiBold" />
+                                </StackPanel>
+                            </Expander.Header>
+                            <StackPanel Spacing="8"
+                                        HorizontalAlignment="Center"
+                                        Margin="0,8,0,4">
+                                <Border Width="260"
+                                        Height="260"
+                                        CornerRadius="14"
+                                        Background="White"
+                                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                        BorderThickness="1">
+                                    <Image Source="ms-appx:///Assets/sponsor-qr.png"
+                                           Stretch="UniformToFill"
+                                           AutomationProperties.Name="赞助二维码" />
+                                </Border>
+                                <TextBlock Text="扫码赞助，感谢支持"
+                                           FontSize="10.5"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                           HorizontalAlignment="Center" />
+                            </StackPanel>
+                        </Expander>
+                    </Border>
+
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel Spacing="12">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE946;" FontSize="16" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                                <TextBlock Text="关于" Style="{StaticResource CardTitleStyle}" />
+                            </StackPanel>
+                            <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <Border Width="44" Height="44" CornerRadius="12"
+                                        Background="Transparent">
+                                    <Image Source="ms-appx:///Assets/777.png" Stretch="Uniform" />
+                                </Border>
+                                <StackPanel VerticalAlignment="Center" Spacing="2">
+                                    <TextBlock Text="IDV 启动器" FontSize="15" FontWeight="SemiBold" />
+                                    <TextBlock Text="v1.0.0 · WinUI 3 / .NET 8"
+                                               FontSize="10.5"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <TextBlock Text="第五人格单窗口启动器。账号数据仅保存在本机。"
+                                       FontSize="11"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </ScrollViewer>
+</Page>

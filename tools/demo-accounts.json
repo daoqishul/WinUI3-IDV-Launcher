@@ -1,0 +1,32 @@
+[
+  {
+    "uuid": "demo-huawei-001",
+    "name": "夜莺",
+    "channel": "huawei",
+    "login": "138****2046",
+    "note": "",
+    "source": "local",
+    "lastLogin": 1794662178,
+    "isDefault": true
+  },
+  {
+    "uuid": "demo-bilibili-002",
+    "name": "雾都旅人",
+    "channel": "bilibili_sdk",
+    "login": "bili_88213",
+    "note": "",
+    "source": "local",
+    "lastLogin": 1794492978,
+    "isDefault": false
+  },
+  {
+    "uuid": "demo-myapp-003",
+    "name": "小号 · 微信",
+    "channel": "myapp",
+    "login": "wx_****",
+    "note": "",
+    "source": "idv-login",
+    "lastLogin": 1793888178,
+    "isDefault": false
+  }
+]

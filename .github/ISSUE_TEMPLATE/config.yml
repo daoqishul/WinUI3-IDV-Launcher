@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 使用说明
+    url: https://github.com/daoqishul/WinUI3-IDV-Launcher/blob/main/docs/USAGE.md
+    about: 构建、运行和常见问题
+  - name: 安全漏洞
+    url: https://github.com/daoqishul/WinUI3-IDV-Launcher/security/advisories/new
+    about: 请勿公开提交安全漏洞

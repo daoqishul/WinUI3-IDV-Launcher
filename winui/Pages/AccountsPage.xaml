@@ -1,0 +1,273 @@
+﻿<Page
+    x:Class="IdvLauncher.Pages.AccountsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:IdvLauncher.Models"
+    mc:Ignorable="d"
+    Background="Transparent">
+
+    <Grid Padding="24,14,24,18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid ColumnSpacing="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <TextBlock Text="账号管理" Style="{StaticResource PageTitleStyle}" />
+                <TextBlock Text="原版渠道服账号 · 按渠道筛选并登录"
+                           Style="{StaticResource PageSubtitleStyle}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        Spacing="8"
+                        VerticalAlignment="Center">
+                <Button x:Name="ManageButton"
+                        Content="添加渠道账号"
+                        Style="{StaticResource AccentButtonStyle}"
+                        Click="OnAddAccount" />
+                <Button x:Name="RefreshButton"
+                        Content="刷新"
+                        Click="OnRefresh" />
+            </StackPanel>
+        </Grid>
+
+        <InfoBar x:Name="AccountsInfo"
+                 Grid.Row="1"
+                 Margin="0,10,0,0"
+                 IsOpen="False"
+                 IsClosable="True"
+                 Severity="Informational" />
+
+        <Border Grid.Row="2"
+                Style="{StaticResource CardStyle}"
+                Padding="10"
+                Margin="0,10,0,0">
+            <Grid ColumnSpacing="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="SearchBox"
+                         PlaceholderText="搜索账号、渠道服或 UUID"
+                         TextChanged="OnSearchChanged" />
+                <ComboBox x:Name="ChannelCombo"
+                          Grid.Column="1"
+                          PlaceholderText="选择渠道服"
+                          DisplayMemberPath="Label"
+                          SelectionChanged="OnChannelChanged" />
+                <TextBlock x:Name="CountText"
+                           Grid.Column="2"
+                           VerticalAlignment="Center"
+                           FontSize="11.5"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="3"
+                Style="{StaticResource CardStyle}"
+                Padding="0"
+                Margin="0,10,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Border BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="0,0,0,1">
+                    <Grid Padding="18,10" ColumnSpacing="14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="44" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="120" />
+                            <ColumnDefinition Width="132" />
+                            <ColumnDefinition Width="36" />
+                            <ColumnDefinition Width="36" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="1"
+                                   Text="渠道账号"
+                                   FontSize="11"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        <TextBlock Grid.Column="2"
+                                   Text="上次登录"
+                                   FontSize="11"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        <TextBlock Grid.Column="3"
+                                   Text="操作"
+                                   FontSize="11"
+                                   HorizontalAlignment="Center"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </Grid>
+                </Border>
+
+                <ListView x:Name="AccountsList"
+                          Grid.Row="1"
+                          SelectionMode="None"
+                          IsItemClickEnabled="False"
+                          Padding="6,4"
+                          ItemContainerStyle="{StaticResource ModernListViewItemStyle}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="models:EngineAccountRow">
+                            <Border Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="10"
+                                    Padding="12,9"
+                                    Margin="0,2">
+                                <Grid ColumnSpacing="14">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="44" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="120" />
+                                        <ColumnDefinition Width="132" />
+                                        <ColumnDefinition Width="36" />
+                                        <ColumnDefinition Width="36" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border Width="40"
+                                            Height="40"
+                                            CornerRadius="12"
+                                            Background="{x:Bind AvatarBackground}"
+                                            BorderBrush="{x:Bind AvatarBorder}"
+                                            BorderThickness="1"
+                                            VerticalAlignment="Center">
+                                        <TextBlock Text="{x:Bind Initial}"
+                                                   FontSize="15"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{x:Bind BadgeForeground}"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                    </Border>
+
+                                    <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock Text="{x:Bind DisplayName}"
+                                                       FontSize="14.5"
+                                                       FontWeight="SemiBold"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <Border Background="{x:Bind BadgeBackground}"
+                                                    BorderBrush="{x:Bind AvatarBorder}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="7"
+                                                    Padding="7,1"
+                                                    VerticalAlignment="Center">
+                                                <TextBlock Text="{x:Bind ChannelName}"
+                                                           FontSize="9.5"
+                                                           Foreground="{x:Bind BadgeForeground}" />
+                                            </Border>
+                                        </StackPanel>
+                                        <TextBlock Text="{x:Bind Meta}"
+                                                   FontSize="11"
+                                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                        <TextBlock Text="{x:Bind Uuid}"
+                                                   FontSize="9.5"
+                                                   Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                                   TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+
+                                    <TextBlock Grid.Column="2"
+                                               Text="{x:Bind LastLoginText}"
+                                               FontSize="11.5"
+                                               VerticalAlignment="Center"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+                                    <Button Grid.Column="3"
+                                            Content="{x:Bind LoginText, Mode=OneWay}"
+                                            IsEnabled="{x:Bind CanLogin, Mode=OneWay}"
+                                            Style="{StaticResource AccentButtonStyle}"
+                                            Tag="{x:Bind Uuid}"
+                                            HorizontalAlignment="Stretch"
+                                            Click="OnLoginAccount" />
+
+                                    <Button Grid.Column="4"
+                                            Style="{StaticResource IconButtonStyle}"
+                                            Tag="{x:Bind Uuid}"
+                                            Click="OnSetDefault"
+                                            ToolTipService.ToolTip="{x:Bind DefaultTooltip, Mode=OneWay}">
+                                        <FontIcon Glyph="{x:Bind DefaultGlyph, Mode=OneWay}"
+                                                  FontSize="15"
+                                                  Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                                    </Button>
+
+                                    <Button Grid.Column="5"
+                                            Style="{StaticResource IconButtonStyle}">
+                                        <Button.Flyout>
+                                            <MenuFlyout>
+                                                <MenuFlyoutItem Text="重命名账号" Tag="{x:Bind Uuid}" Click="OnRenameAccount" />
+                                                <MenuFlyoutItem Text="删除账号" Tag="{x:Bind Uuid}" Click="OnDeleteAccount" />
+                                            </MenuFlyout>
+                                        </Button.Flyout>
+                                        <FontIcon Glyph="&#xE712;" FontSize="14" />
+                                    </Button>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+                <StackPanel x:Name="EmptyState"
+                            Grid.Row="1"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Spacing="10"
+                            Visibility="Collapsed">
+                    <Border Width="62"
+                            Height="62"
+                            CornerRadius="18"
+                            Background="{ThemeResource LayerFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1">
+                        <FontIcon Glyph="&#xE77B;"
+                                  FontSize="26"
+                                  Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                    </Border>
+                    <TextBlock x:Name="EmptyTitle"
+                               Text="还没有渠道账号"
+                               FontSize="17"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center" />
+                    <TextBlock x:Name="EmptyDescription"
+                               Text="选择渠道服，扫码或完成渠道登录后账号会出现在这里。"
+                               FontSize="11.5"
+                               MaxWidth="360"
+                               TextAlignment="Center"
+                               TextWrapping="Wrap"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <Button Content="添加渠道账号"
+                            Style="{StaticResource AccentButtonStyle}"
+                            HorizontalAlignment="Center"
+                            Click="OnAddAccount" />
+                </StackPanel>
+
+                <ProgressRing x:Name="LoadingRing"
+                              Grid.Row="1"
+                              Width="32"
+                              Height="32"
+                              IsActive="False"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center" />
+
+                <Border Grid.Row="2"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="0,1,0,0">
+                    <TextBlock x:Name="FooterText"
+                               Margin="20,11"
+                               Text="账号来自原版 channels-v2.json · 添加/改名/删除均在本窗口完成"
+                               FontSize="10.5"
+                               Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

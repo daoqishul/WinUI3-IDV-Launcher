@@ -1,0 +1,22 @@
+[
+  {
+    "uuid": "idv-demo-001",
+    "name": "渠道测试号",
+    "channel_name": "huawei",
+    "last_login_time": 1794600000,
+    "user_info": { "login_channel": "huawei", "uid": "hw_10001" },
+    "login_info": {},
+    "ext_info": {},
+    "record_source": "manual"
+  },
+  {
+    "uuid": "idv-demo-002",
+    "name": "B站小号",
+    "channel_name": "bilibili_sdk",
+    "last_login_time": 1794400000,
+    "user_info": { "login_channel": "bilibili_sdk" },
+    "login_info": {},
+    "ext_info": {},
+    "record_source": "scan"
+  }
+]

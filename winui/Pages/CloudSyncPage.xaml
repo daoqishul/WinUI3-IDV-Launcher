@@ -1,0 +1,119 @@
+<Page
+    x:Class="IdvLauncher.Pages.CloudSyncPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="Transparent">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled"
+                  HorizontalScrollMode="Disabled"
+                  HorizontalContentAlignment="Stretch">
+        <Grid Padding="24,14,24,18">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <StackPanel>
+                <TextBlock Text="云存档" Style="{StaticResource PageTitleStyle}" />
+                <TextBlock Text="原版 IDV-Login 加密云同步"
+                           Style="{StaticResource PageSubtitleStyle}" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Margin="0,12,0,0" Spacing="12">
+                <InfoBar x:Name="CloudInfo"
+                         IsOpen="False"
+                         IsClosable="True"
+                         Severity="Informational" />
+
+                <Border Style="{StaticResource CardStyle}" MaxWidth="720" HorizontalAlignment="Left">
+                    <StackPanel Spacing="14">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE753;" FontSize="17"
+                                      Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                            <TextBlock Text="加密同步" Style="{StaticResource CardTitleStyle}" />
+                        </StackPanel>
+                        <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                        <Grid ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <PasswordBox x:Name="MasterKeyBox"
+                                         Header="主密钥（至少 12 位，包含 3 类字符）"
+                                         PlaceholderText="不会保存到本机"
+                                         PasswordChanged="OnMasterKeyChanged" />
+                            <Button Grid.Column="1"
+                                    Content="生成"
+                                    VerticalAlignment="Bottom"
+                                    Click="OnGenerateKey" />
+                        </Grid>
+
+                        <CheckBox x:Name="ConsentCheck"
+                                  Content="我同意云同步存储与权限说明"
+                                  Checked="OnOptionChanged"
+                                  Unchecked="OnOptionChanged" />
+
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="自动同步" Style="{StaticResource SettingLabelStyle}" />
+                                <TextBlock Text="保存设置后由登录服务按原版策略执行"
+                                           Style="{StaticResource SettingDescriptionStyle}" />
+                            </StackPanel>
+                            <ToggleSwitch x:Name="AutoSyncToggle"
+                                          Grid.Column="1"
+                                          VerticalAlignment="Center"
+                                          OnContent=""
+                                          OffContent=""
+                                          Toggled="OnAutoSyncToggled" />
+                        </Grid>
+
+                        <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Button x:Name="PushButton"
+                                    Content="上传本地存档"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    Click="OnPush" />
+                            <Button x:Name="PullButton"
+                                    Content="下载云端存档"
+                                    Click="OnPull" />
+                            <Button x:Name="SyncButton"
+                                    Content="双向同步"
+                                    Click="OnSync" />
+                        </StackPanel>
+
+                        <TextBlock Text="下载会覆盖本地账号记录；上传会把当前账号记录加密后写入云端。主密钥不会保存在启动器中。"
+                                   Style="{StaticResource SettingDescriptionStyle}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource CardStyle}" MaxWidth="720" HorizontalAlignment="Left">
+                    <StackPanel Spacing="10">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE74D;" FontSize="16"
+                                      Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                            <TextBlock Text="云端管理" Style="{StaticResource CardTitleStyle}" />
+                        </StackPanel>
+                        <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                        <TextBlock x:Name="CloudStatusText"
+                                   Text="登录服务就绪后可操作云端存档。"
+                                   Style="{StaticResource SettingDescriptionStyle}" />
+                        <Button x:Name="DeleteButton"
+                                Content="删除云端存档"
+                                HorizontalAlignment="Left"
+                                Click="OnDelete" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</Page>

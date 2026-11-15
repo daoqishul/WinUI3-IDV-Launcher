@@ -1,0 +1,102 @@
+<Page
+    x:Class="IdvLauncher.Pages.InjectionPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="Transparent">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled"
+                  HorizontalScrollMode="Disabled"
+                  HorizontalContentAlignment="Stretch">
+        <Grid Padding="24,14,24,18">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <StackPanel>
+                <TextBlock Text="解帧" Style="{StaticResource PageTitleStyle}" />
+                <TextBlock Text="解除第五人格帧率限制"
+                           Style="{StaticResource PageSubtitleStyle}" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Margin="0,12,0,0" Spacing="12">
+                <InfoBar x:Name="FrameInfo"
+                         IsOpen="False"
+                         IsClosable="True"
+                         Severity="Informational" />
+
+                <TextBlock Text="封号后果自负本人概不负责！"
+                           FontSize="13"
+                           FontWeight="SemiBold"
+                           Foreground="#FFE04B4B" />
+
+                <Border Style="{StaticResource CardStyle}" MaxWidth="620" HorizontalAlignment="Left">
+                    <StackPanel Spacing="12">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE7FC;" FontSize="17"
+                                      Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                            <TextBlock Text="帧率设置" Style="{StaticResource CardTitleStyle}" />
+                        </StackPanel>
+                        <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="解帧" Style="{StaticResource SettingLabelStyle}" />
+                                <TextBlock Text="关闭解帧后，需重启游戏恢复默认帧率"
+                                           Style="{StaticResource SettingDescriptionStyle}" />
+                            </StackPanel>
+                            <ToggleSwitch x:Name="FrameToggle"
+                                          Grid.Column="1"
+                                          VerticalAlignment="Center"
+                                          OnContent=""
+                                          OffContent=""
+                                          Toggled="OnFrameToggled" />
+                        </Grid>
+
+                        <NumberBox x:Name="FrameRateBox"
+                                   Header="目标帧率（上限 500）"
+                                   Minimum="30"
+                                   Maximum="500"
+                                   SmallChange="10"
+                                   LargeChange="30"
+                                   Value="120"
+                                   SpinButtonPlacementMode="Compact"
+                                   ValueChanged="OnFrameRateChanged" />
+
+                        <Button x:Name="ApplyButton"
+                                Content="应用解帧"
+                                Style="{StaticResource AccentButtonStyle}"
+                                HorizontalAlignment="Left"
+                                Click="OnApplyFrame" />
+
+                        <TextBlock Text="使用 Tools\解帧.exe。需要第五人格正在运行，并以管理员身份启动本程序。"
+                                   Style="{StaticResource SettingDescriptionStyle}" />
+
+                        <Grid ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock x:Name="GameDetectText"
+                                       Text="正在检测游戏进程…"
+                                       FontSize="11"
+                                       VerticalAlignment="Center"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <Button Grid.Column="1"
+                                    Content="重新检测"
+                                    Click="OnRefreshGameDetection" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</Page>
