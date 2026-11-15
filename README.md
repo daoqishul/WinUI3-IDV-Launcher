@@ -98,18 +98,6 @@ build.ps1               构建脚本
 | 游戏键位配置 | `<游戏目录>\Documents\pc_key_setting_data.json` |
 | 游戏画质配置 | `<游戏目录>\Documents\setting_data.json` |
 
-## 构建安装包
-
-1. 将原版 IDV-Login 程序放到 `engine-payload\IDV-Login`（不提交到仓库）。
-2. 安装 [Inno Setup 7](https://jrsoftware.org/isinfo.php)。
-3. 执行：
-
-```powershell
-& "C:\Program Files\Inno Setup 7\ISCC.exe" .\installer.iss
-```
-
-输出：`installer\IDVLauncher-Setup-v1.0.0.exe`
-
 ## 参与贡献
 
 请阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。
