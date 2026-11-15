@@ -512,7 +512,7 @@
                                 </Border>
                                 <StackPanel VerticalAlignment="Center" Spacing="2">
                                     <TextBlock Text="IDV 启动器" FontSize="15" FontWeight="SemiBold" />
-                                    <TextBlock Text="v1.0.0 · WinUI 3 / .NET 8"
+                                    <TextBlock Text="v1.0.4 · WinUI 3 / .NET 8"
                                                FontSize="10.5"
                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                 </StackPanel>

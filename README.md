@@ -67,7 +67,7 @@ dotnet build .\winui\IdvLauncher.csproj -c Release -p:Platform=x64
 
 ```text
 dist\
-IDVLauncher-WinUI3-v1.0.0-win64.zip
+IDVLauncher-WinUI3-v1.0.4-win64.zip
 ```
 
 ## 项目结构
@@ -97,6 +97,18 @@ build.ps1               构建脚本
 | 原版引擎程序 | 安装包内置时位于 `{app}\engine\IDV-Login` |
 | 游戏键位配置 | `<游戏目录>\Documents\pc_key_setting_data.json` |
 | 游戏画质配置 | `<游戏目录>\Documents\setting_data.json` |
+
+## 构建安装包
+
+1. 将原版 IDV-Login 程序放到 `engine-payload\IDV-Login`（不提交到仓库）。
+2. 安装 [Inno Setup 7](https://jrsoftware.org/isinfo.php)。
+3. 执行：
+
+```powershell
+& "C:\Program Files\Inno Setup 7\ISCC.exe" .\installer.iss
+```
+
+输出：`installer\IDVLauncher-Setup-v1.0.4.exe`
 
 ## 参与贡献
 

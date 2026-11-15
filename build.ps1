@@ -27,7 +27,7 @@ if (Test-Path $distReadme) {
 }
 
 if ($Package) {
-    $zip = Join-Path $root 'IDVLauncher-WinUI3-v1.0.0-win64.zip'
+    $zip = Join-Path $root 'IDVLauncher-WinUI3-v1.0.4-win64.zip'
     Remove-Item $zip -Force -ErrorAction SilentlyContinue
     Compress-Archive -Path (Join-Path $dist '*') -DestinationPath $zip -CompressionLevel Optimal
     Write-Host "Packaged: $zip"
