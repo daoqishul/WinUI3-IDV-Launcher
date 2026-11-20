@@ -101,20 +101,6 @@
                                               FallbackColor="#D9100F0D" />
                             </Border.Background>
                             <Grid>
-                                <Image x:Name="AnnouncementImage"
-                                       Stretch="UniformToFill"
-                                       Opacity="0.46"
-                                       IsHitTestVisible="False" />
-                                <Border IsHitTestVisible="False">
-                                    <Border.Background>
-                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                            <GradientStop Color="#B80E0D0B" Offset="0" />
-                                            <GradientStop Color="#550E0D0B" Offset="0.6" />
-                                            <GradientStop Color="#C80E0D0B" Offset="1" />
-                                        </LinearGradientBrush>
-                                    </Border.Background>
-                                </Border>
-                                <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="*" />
@@ -122,7 +108,9 @@
 
                                 <Grid>
                                     <StackPanel Orientation="Horizontal" Spacing="7" VerticalAlignment="Center">
-                                        <Ellipse Width="4" Height="4" Fill="{ThemeResource AccentFillColorDefaultBrush}" />
+                                        <Rectangle Width="3" Height="14"
+                                                   RadiusX="1.5" RadiusY="1.5"
+                                                   Fill="{ThemeResource AccentFillColorDefaultBrush}" />
                                         <TextBlock Text="游戏公告"
                                                    FontSize="12"
                                                    FontWeight="SemiBold"
@@ -140,12 +128,26 @@
                                             Click="OnOpenAnnouncements" />
                                 </Grid>
 
-                                <ItemsControl x:Name="AnnouncementList" Grid.Row="1" Margin="0,4,0,0">
-                                    <ItemsControl.ItemTemplate>
+                                <ListView x:Name="AnnouncementList"
+                                          Grid.Row="1"
+                                          Margin="0,4,0,0"
+                                          SelectionMode="None"
+                                          IsItemClickEnabled="True"
+                                          ItemClick="OnAnnouncementClick"
+                                          ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                                    <ListView.ItemContainerStyle>
+                                        <Style TargetType="ListViewItem">
+                                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                            <Setter Property="MinHeight" Value="36" />
+                                            <Setter Property="Padding" Value="0,2" />
+                                            <Setter Property="Background" Value="Transparent" />
+                                        </Style>
+                                    </ListView.ItemContainerStyle>
+                                    <ListView.ItemTemplate>
                                         <DataTemplate x:DataType="models:Announcement">
-                                            <Grid Height="38" ColumnSpacing="8">
+                                            <Grid Height="36" ColumnSpacing="8">
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="58" />
+                                                    <ColumnDefinition Width="54" />
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
@@ -171,9 +173,8 @@
                                                 </Border>
                                             </Grid>
                                         </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                                </Grid>
+                                    </ListView.ItemTemplate>
+                                </ListView>
                             </Grid>
                         </Border>
 

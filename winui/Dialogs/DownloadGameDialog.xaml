@@ -60,6 +60,8 @@
                     Grid.Column="1"
                     Content="开始下载"
                     Style="{StaticResource PrimaryButtonStyle}"
+                    CornerRadius="4"
+                    Padding="20,8"
                     Click="OnStart" />
             <Button Grid.Column="2"
                     Content="关闭"

@@ -566,7 +566,7 @@ public sealed partial class MainWindow : Window
             "accounts" => "账号管理",
             "settings" => "设置",
             "engine" => "登录引擎",
-            "injection" => "解帧",
+            "injection" => "注入",
             "cloud" => "云存档",
             "keys" => "键位设置",
             _ => "首页",
@@ -617,7 +617,7 @@ public sealed partial class MainWindow : Window
             "accounts" => "账号管理",
             "settings" => "设置",
             "engine" => "登录引擎",
-            "injection" => "解帧",
+            "injection" => "注入",
             "cloud" => "云存档",
             _ => "首页",
         };

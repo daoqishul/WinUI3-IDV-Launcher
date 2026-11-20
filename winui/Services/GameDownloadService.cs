@@ -55,6 +55,8 @@ public static class GameDownloadService
 
         if (options.Count == 0)
             options.Add(new GameDownloadOption(-1, "官方 PC 版", "由登录引擎选择默认版本"));
+        options.Add(new GameDownloadOption(-2, "共研服（独立客户端）",
+            "需官方共研资格；原软件目录未提供独立分发"));
         return options
             .GroupBy(o => o.DistributionId)
             .Select(g => g.First())
@@ -88,20 +90,20 @@ public static class GameDownloadService
 
     public static async Task StartAsync(GameDownloadOption option, string targetDir)
     {
+        if (option.DistributionId == -2)
+            throw new EngineException("共研服为独立客户端，原版引擎目录中没有它的下载分发。请使用官方共研资格邮件中的安装包。");
+
         _startedAtUtc = DateTime.UtcNow;
         if (!EngineService.Instance.IsReady)
             await EngineService.Instance.StartAsync().ConfigureAwait(false);
 
-        var body = new JsonObject
-        {
-            ["game_id"] = Store.Instance.Settings.EngineGameId,
-            ["target_dir"] = targetDir,
-        };
+        string gameId = Uri.EscapeDataString(Store.Instance.Settings.EngineGameId);
+        string dir = Uri.EscapeDataString(targetDir);
+        string url = $"_idv-login/launcher-install?game_id={gameId}&target_dir={dir}";
         if (option.DistributionId > 0)
-            body["distribution_id"] = option.DistributionId;
+            url += $"&distribution_id={option.DistributionId}";
 
-        using var content = new StringContent(body.ToJsonString(), Encoding.UTF8, "application/json");
-        using var response = await Http.PostAsync("_idv-login/launcher-install", content).ConfigureAwait(false);
+        using var response = await Http.GetAsync(url).ConfigureAwait(false);
         string text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)
         {

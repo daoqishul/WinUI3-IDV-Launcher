@@ -114,37 +114,12 @@ public sealed partial class HomePage : Page
             AnnouncementSourceText.Text = result.FromNetwork
                 ? "官方源 · id5.163.com"
                 : "本地缓存";
-            SetAnnouncementImage(result.BannerUrl);
         }
         catch
         {
             _announcements = Store.Instance.Announcements.ToList();
             AnnouncementSourceText.Text = "本地缓存";
-            SetAnnouncementImage("");
         }
-    }
-
-    private void SetAnnouncementImage(string url)
-    {
-        try
-        {
-            Uri? uri = null;
-            if (!string.IsNullOrWhiteSpace(url) && Uri.TryCreate(url, UriKind.Absolute, out var remote))
-                uri = remote;
-            if (uri is null)
-            {
-                string local = Path.Combine(AppContext.BaseDirectory, "Assets", "announcement.jpg");
-                if (!File.Exists(local)) local = Path.Combine(AppContext.BaseDirectory, "Assets", "cover.jpg");
-                if (File.Exists(local)) uri = new Uri(local, UriKind.Absolute);
-            }
-            if (uri is null) return;
-            AnnouncementImage.Source = new BitmapImage
-            {
-                DecodePixelWidth = 720,
-                UriSource = uri,
-            };
-        }
-        catch { }
     }
 
     private async Task LoadAccountsAsync()
@@ -468,6 +443,20 @@ public sealed partial class HomePage : Page
         }
     }
 
+    private void OnAnnouncementClick(object sender, ItemClickEventArgs e)
+    {
+        if (e.ClickedItem is not Announcement item) return;
+        if (string.IsNullOrWhiteSpace(item.Url)) return;
+        try
+        {
+            Process.Start(new ProcessStartInfo(item.Url) { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            App.MainWindow?.ShowInfo($"打开公告失败：{ex.Message}", InfoBarSeverity.Error);
+        }
+    }
+
     private void OnOpenAnnouncements(object sender, RoutedEventArgs e)
     {
         try
@@ -604,7 +593,10 @@ public sealed partial class HomePage : Page
                 try
                 {
                     var config = await EngineConfigStore.LoadAsync(settings.EngineGameId);
-                    bool needRestart = !EngineService.Instance.IsReady;
+                    // Manual QR must always restart the engine: the engine
+                    // keeps auto-* in memory and can otherwise re-use the
+                    // previously selected account even after the file is clear.
+                    bool needRestart = settings.ManualQrMode || !EngineService.Instance.IsReady;
                     if (!needRestart && config.Loaded)
                     {
                         bool configAuto = !string.IsNullOrWhiteSpace(config.SelectedUuid);

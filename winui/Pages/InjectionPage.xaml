@@ -18,7 +18,7 @@
             </Grid.RowDefinitions>
 
             <StackPanel>
-                <TextBlock Text="解帧" Style="{StaticResource PageTitleStyle}" />
+                <TextBlock Text="注入" Style="{StaticResource PageTitleStyle}" />
                 <TextBlock Text="解除第五人格帧率限制"
                            Style="{StaticResource PageSubtitleStyle}" />
             </StackPanel>
