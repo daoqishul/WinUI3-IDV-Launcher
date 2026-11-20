@@ -97,9 +97,6 @@ public sealed class AppSettings
     [JsonPropertyName("keyConfigPath")]
     public string KeyConfigPath { get; set; } = "";
 
-    [JsonPropertyName("manualQrMode")]
-    public bool ManualQrMode { get; set; }
-
     [JsonPropertyName("autoStartEngine")]
     public bool AutoStartEngine { get; set; } = true;
 

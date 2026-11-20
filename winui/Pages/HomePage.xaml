@@ -216,17 +216,9 @@
                                     CornerRadius="10"
                                     Padding="10,8">
                                 <StackPanel Spacing="5">
-                                    <Grid>
-                                        <TextBlock Text="当前账号"
-                                                   FontSize="8.5"
-                                                   Foreground="#8FFFFFFF" />
-                                        <TextBlock x:Name="ManualModeText"
-                                                   Text="手动扫码"
-                                                   HorizontalAlignment="Right"
-                                                   FontSize="8.5"
-                                                   Foreground="#D8B36C"
-                                                   Visibility="Collapsed" />
-                                    </Grid>
+                                    <TextBlock Text="当前账号"
+                                               FontSize="8.5"
+                                               Foreground="#8FFFFFFF" />
                                     <ComboBox x:Name="HomeAccountCombo"
                                               HorizontalAlignment="Stretch"
                                               MinHeight="32"
@@ -234,12 +226,6 @@
                                               DisplayMemberPath="Display"
                                               SelectionChanged="OnAccountSelectionChanged"
                                               PlaceholderText="未读取到渠道账号" />
-                                    <CheckBox x:Name="ManualQrCheckBox"
-                                              Content="手动扫码登录（不自动选号）"
-                                              FontSize="10"
-                                              Foreground="#D9FFFFFF"
-                                              Checked="OnManualQrChanged"
-                                              Unchecked="OnManualQrChanged" />
                                 </StackPanel>
                             </Border>
 

@@ -23,7 +23,6 @@ public sealed partial class HomePage : Page
     private bool _engineAccounts;
     private bool _engineSubscribed;
     private bool _engineStarting;
-    private bool _manualQrLoading;
     private bool _gameBusy;
     private List<Announcement> _announcements = new();
     private List<HomeAccountOption> _accountOptions = new();
@@ -44,9 +43,6 @@ public sealed partial class HomePage : Page
             _engineSubscribed = true;
         }
         SetHeroImage();
-        _manualQrLoading = true;
-        ManualQrCheckBox.IsChecked = Store.Instance.Settings.ManualQrMode;
-        _manualQrLoading = false;
         await LoadAnnouncementsAsync();
         await LoadAccountsAsync();
         Refresh();
@@ -193,21 +189,6 @@ public sealed partial class HomePage : Page
         {
             // A manual launch will retry and surface a useful error.
         }
-    }
-
-    private void OnManualQrChanged(object sender, RoutedEventArgs e)
-    {
-        if (_manualQrLoading) return;
-        bool manual = ManualQrCheckBox.IsChecked == true;
-        Store.Instance.Settings.ManualQrMode = manual;
-        Store.Instance.SaveSettings();
-        HomeAccountCombo.IsEnabled = !manual;
-        ManualModeText.Visibility = manual ? Visibility.Visible : Visibility.Collapsed;
-        App.MainWindow?.ShowInfo(manual
-            ? "手动扫码模式已开启：启动游戏不会自动选号，请在游戏内扫码。"
-            : "手动扫码模式已关闭：启动游戏会登录当前选中的账号。",
-            InfoBarSeverity.Informational);
-        RefreshStatus();
     }
 
     private void OnLocateGame(object sender, RoutedEventArgs e)
@@ -357,11 +338,10 @@ public sealed partial class HomePage : Page
             : Color.FromArgb(255, 158, 151, 138));
 
         DownloadGameButton.Visibility = hasGame ? Visibility.Collapsed : Visibility.Visible;
-        ManualModeText.Visibility = settings.ManualQrMode ? Visibility.Visible : Visibility.Collapsed;
-        HomeAccountCombo.IsEnabled = !settings.ManualQrMode;
-        HomeAccountCombo.PlaceholderText = settings.ManualQrMode
-            ? "手动扫码模式"
-            : _accountOptions.Count > 0 ? "未收藏账号（手动登录）" : "未读取到渠道账号";
+        HomeAccountCombo.IsEnabled = true;
+        HomeAccountCombo.PlaceholderText = _accountOptions.Count > 0
+            ? "未收藏账号（手动登录）"
+            : "未读取到渠道账号";
 
         var engine = EngineService.Instance;
         bool engineReady = !settings.UseLoginEngine ||
@@ -393,7 +373,7 @@ public sealed partial class HomePage : Page
         else
         {
             LaunchButton.IsEnabled = true;
-            LaunchText.Text = settings.ManualQrMode ? "手动扫码启动" : "启动游戏";
+            LaunchText.Text = "启动游戏";
         }
 
         RefreshEngineStatus();
@@ -407,7 +387,7 @@ public sealed partial class HomePage : Page
 
         // With the toggle off, selecting an account is only a local/UI choice;
         // do not write auto-h55 and silently re-enable automatic login.
-        if (!Store.Instance.Settings.AutoScanLogin || Store.Instance.Settings.ManualQrMode)
+        if (!Store.Instance.Settings.AutoScanLogin)
         {
             Store.Instance.SetDefault(option.Uuid);
             return;
@@ -579,12 +559,8 @@ public sealed partial class HomePage : Page
 
         try
         {
-            string selectedUuid = settings.ManualQrMode
-                ? ""
-                : (HomeAccountCombo.SelectedItem as HomeAccountOption)?.Uuid ?? "";
-            autoLogin = settings.AutoScanLogin &&
-                        !settings.ManualQrMode &&
-                        !string.IsNullOrWhiteSpace(selectedUuid);
+            string selectedUuid = (HomeAccountCombo.SelectedItem as HomeAccountOption)?.Uuid ?? "";
+            autoLogin = settings.AutoScanLogin && !string.IsNullOrWhiteSpace(selectedUuid);
 
             if (settings.UseLoginEngine && EngineService.Instance.IsInstalled)
             {
@@ -593,10 +569,7 @@ public sealed partial class HomePage : Page
                 try
                 {
                     var config = await EngineConfigStore.LoadAsync(settings.EngineGameId);
-                    // Manual QR must always restart the engine: the engine
-                    // keeps auto-* in memory and can otherwise re-use the
-                    // previously selected account even after the file is clear.
-                    bool needRestart = settings.ManualQrMode || !EngineService.Instance.IsReady;
+                    bool needRestart = !EngineService.Instance.IsReady;
                     if (!needRestart && config.Loaded)
                     {
                         bool configAuto = !string.IsNullOrWhiteSpace(config.SelectedUuid);

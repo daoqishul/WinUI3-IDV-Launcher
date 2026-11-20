@@ -65,7 +65,6 @@ public sealed class Store
         {
             Settings.AutoScanLogin = true;
             Settings.AutoStartEngine = true;
-            Settings.ManualQrMode = false;
             Settings.SettingsSchema = 4;
             SaveSettings();
         }

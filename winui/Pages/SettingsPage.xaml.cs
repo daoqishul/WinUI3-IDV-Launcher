@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using IdvLauncher.Dialogs;
 using IdvLauncher.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -379,23 +378,19 @@ public sealed partial class SettingsPage : Page
             await App.MainWindow.ShowDisclaimerDocumentAsync();
     }
 
-    private async void OnDownloadGame(object sender, RoutedEventArgs e)
+    private void OnDownloadGame(object sender, RoutedEventArgs e)
     {
-        if (App.MainWindow is null) return;
-        var dialog = new DownloadGameDialog();
-        App.MainWindow.ShowModal(dialog);
-        await dialog.WaitForCloseAsync();
-        App.MainWindow.HideModal();
-        string current = Store.Instance.Settings.GamePath;
-        if (string.IsNullOrWhiteSpace(current) || !File.Exists(current))
+        try
         {
-            string path = Store.DetectGamePath();
-            if (path.Length > 0)
+            Process.Start(new ProcessStartInfo(
+                "https://wiki.biligame.com/dwrg/PC%E4%BA%92%E9%80%9A%E7%89%88")
             {
-                Store.Instance.Settings.GamePath = path;
-                Store.Instance.SaveSettings();
-                LoadState();
-            }
+                UseShellExecute = true,
+            });
+        }
+        catch (Exception ex)
+        {
+            App.MainWindow?.ShowInfo($"无法打开下载页：{ex.Message}", InfoBarSeverity.Error);
         }
     }
 }
