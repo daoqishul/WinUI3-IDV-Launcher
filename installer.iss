@@ -1,5 +1,5 @@
 #define MyAppName "IDV 启动器"
-#define MyAppVersion "1.0.4"
+#define MyAppVersion "1.0.5"
 #define MyAppPublisher "IDV Launcher"
 #define MyAppExeName "IdvLauncher.exe"
 #define MyAppId "{{7C1E6B0A-6F5A-4A5E-9E0B-1D2A7C9F4E31}"
@@ -28,7 +28,7 @@ MinVersion=10.0
 LicenseFile=packaging\EULA.txt
 CloseApplications=yes
 RestartApplications=no
-VersionInfoVersion=1.0.4.0
+VersionInfoVersion=1.0.5.0
 VersionInfoDescription={#MyAppName} 安装程序
 VersionInfoProductName={#MyAppName}
 VersionInfoCompany={#MyAppPublisher}

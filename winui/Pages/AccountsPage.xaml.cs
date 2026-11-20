@@ -419,12 +419,15 @@ public sealed partial class AccountsPage : Page
             return;
         }
 
+        bool gameRunning = GameLauncher.IsRunning();
         _busy = true;
         row.IsBusy = true;
         ManageButton.IsEnabled = false;
         RefreshButton.IsEnabled = false;
         AccountsList.IsEnabled = false;
-        ShowInfo($"正在切换到 {row.DisplayName}（{row.ChannelName}）并启动登录…",
+        ShowInfo(gameRunning
+                ? $"正在让游戏登录 {row.DisplayName}（{row.ChannelName}）…"
+                : $"正在切换到 {row.DisplayName}（{row.ChannelName}）并启动登录…",
             InfoBarSeverity.Informational);
 
         try
@@ -432,7 +435,10 @@ public sealed partial class AccountsPage : Page
             await EngineService.Instance.LoginAccountAsync(uuid);
             _defaultUuid = uuid;
             foreach (var item in _allRows) item.IsDefault = item.Uuid == uuid;
-            ShowInfo($"已切换至 {row.DisplayName}，游戏启动中…", InfoBarSeverity.Success);
+            ShowInfo(gameRunning
+                    ? $"已在当前游戏窗口登录 {row.DisplayName}。"
+                    : $"已切换至 {row.DisplayName}，游戏启动中…",
+                InfoBarSeverity.Success);
             ApplyFilter();
 
             if (Store.Instance.Settings.AutoMinimize)

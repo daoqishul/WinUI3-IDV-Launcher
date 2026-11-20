@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using IdvLauncher.Pages;
 using IdvLauncher.Services;
@@ -98,6 +99,7 @@ public sealed partial class MainWindow : Window
             {
                 args.Cancel = true;
                 AppWindow.Hide();
+                TrimWorkingSet();
                 _tray.ShowBalloon();
                 return;
             }
@@ -277,6 +279,7 @@ public sealed partial class MainWindow : Window
 
         SaveBeforeClose();
         try { AppWindow.Hide(); } catch { }
+        TrimWorkingSet();
 
         if (!EngineService.Instance.IsRunning)
         {
@@ -316,7 +319,25 @@ public sealed partial class MainWindow : Window
     {
         if (AppWindow.Presenter is OverlappedPresenter presenter)
             presenter.Minimize();
+        TrimWorkingSet();
     }
+
+    public void TrimWorkingSet()
+    {
+        try
+        {
+            SetProcessWorkingSetSize(Process.GetCurrentProcess().Handle, (IntPtr)(-1), (IntPtr)(-1));
+        }
+        catch { }
+        try
+        {
+            GC.Collect(2, GCCollectionMode.Optimized, blocking: false, compacting: false);
+        }
+        catch { }
+    }
+
+    [DllImport("kernel32.dll")]
+    private static extern bool SetProcessWorkingSetSize(IntPtr process, IntPtr minimum, IntPtr maximum);
 
     public void ShowInfo(string message, InfoBarSeverity severity = InfoBarSeverity.Informational)
     {

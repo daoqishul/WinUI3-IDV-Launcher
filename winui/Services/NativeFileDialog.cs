@@ -99,7 +99,15 @@ public static class NativeFileDialog
         }
     }
 
-    public static string? PickJson(IntPtr owner)
+    public static string? PickJson(IntPtr owner) =>
+        PickFile(owner, "选择 pc_key_setting_data.json",
+            "按键配置 (*.json)\0*.json\0所有文件 (*.*)\0*.*\0\0", "json");
+
+    public static string? PickExecutable(IntPtr owner) =>
+        PickFile(owner, "选择第五人格 dwrg.exe",
+            "游戏程序 (*.exe)\0*.exe\0所有文件 (*.*)\0*.*\0\0", "exe");
+
+    private static string? PickFile(IntPtr owner, string title, string filter, string extension)
     {
         IntPtr buffer = Marshal.AllocHGlobal(BufferChars * sizeof(char));
         try
@@ -111,13 +119,13 @@ public static class NativeFileDialog
             {
                 lStructSize = Marshal.SizeOf<OPENFILENAME>(),
                 hwndOwner = owner,
-                lpstrFilter = "按键配置 (*.json)\0*.json\0所有文件 (*.*)\0*.*\0\0",
+                lpstrFilter = filter,
                 nFilterIndex = 1,
                 lpstrFile = buffer,
                 nMaxFile = BufferChars,
-                lpstrTitle = "选择 pc_key_setting_data.json",
+                lpstrTitle = title,
                 Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
-                lpstrDefExt = "json",
+                lpstrDefExt = extension,
             };
 
             return GetOpenFileNameW(ref dialog)

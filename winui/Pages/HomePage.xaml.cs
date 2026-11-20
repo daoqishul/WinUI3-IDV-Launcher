@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using IdvLauncher.Dialogs;
 using IdvLauncher.Models;
 using IdvLauncher.Services;
 using Microsoft.UI.Xaml;
@@ -22,6 +23,8 @@ public sealed partial class HomePage : Page
     private bool _engineAccounts;
     private bool _engineSubscribed;
     private bool _engineStarting;
+    private bool _manualQrLoading;
+    private bool _gameBusy;
     private List<Announcement> _announcements = new();
     private List<HomeAccountOption> _accountOptions = new();
 
@@ -41,9 +44,13 @@ public sealed partial class HomePage : Page
             _engineSubscribed = true;
         }
         SetHeroImage();
+        _manualQrLoading = true;
+        ManualQrCheckBox.IsChecked = Store.Instance.Settings.ManualQrMode;
+        _manualQrLoading = false;
         await LoadAnnouncementsAsync();
         await LoadAccountsAsync();
         Refresh();
+        _ = PrewarmEngineAsync();
         _statusTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
         _statusTimer.Tick += (_, _) => RefreshStatus();
         _statusTimer.Start();
@@ -76,7 +83,8 @@ public sealed partial class HomePage : Page
         try
         {
             string baseDir = AppContext.BaseDirectory;
-            string path = Path.Combine(baseDir, "Assets", "51.jpg");
+            string path = Path.Combine(baseDir, "Assets", "cover.jpg");
+            if (!File.Exists(path)) path = Path.Combine(baseDir, "Assets", "51.jpg");
             if (!File.Exists(path)) path = Path.Combine(baseDir, "Assets", "tp.png");
             if (!File.Exists(path)) return;
             var bitmap = new BitmapImage
@@ -106,12 +114,37 @@ public sealed partial class HomePage : Page
             AnnouncementSourceText.Text = result.FromNetwork
                 ? "官方源 · id5.163.com"
                 : "本地缓存";
+            SetAnnouncementImage(result.BannerUrl);
         }
         catch
         {
             _announcements = Store.Instance.Announcements.ToList();
             AnnouncementSourceText.Text = "本地缓存";
+            SetAnnouncementImage("");
         }
+    }
+
+    private void SetAnnouncementImage(string url)
+    {
+        try
+        {
+            Uri? uri = null;
+            if (!string.IsNullOrWhiteSpace(url) && Uri.TryCreate(url, UriKind.Absolute, out var remote))
+                uri = remote;
+            if (uri is null)
+            {
+                string local = Path.Combine(AppContext.BaseDirectory, "Assets", "announcement.jpg");
+                if (!File.Exists(local)) local = Path.Combine(AppContext.BaseDirectory, "Assets", "cover.jpg");
+                if (File.Exists(local)) uri = new Uri(local, UriKind.Absolute);
+            }
+            if (uri is null) return;
+            AnnouncementImage.Source = new BitmapImage
+            {
+                DecodePixelWidth = 720,
+                UriSource = uri,
+            };
+        }
+        catch { }
     }
 
     private async Task LoadAccountsAsync()
@@ -169,6 +202,96 @@ public sealed partial class HomePage : Page
     private void OnEngineStateChanged(object? sender, EventArgs e)
     {
         DispatcherQueue.TryEnqueue(RefreshStatus);
+    }
+
+    private async Task PrewarmEngineAsync()
+    {
+        var settings = Store.Instance.Settings;
+        if (!settings.UseLoginEngine || !settings.AutoStartEngine ||
+            !EngineService.Instance.IsInstalled || EngineService.Instance.IsReady)
+            return;
+        try
+        {
+            await EngineService.Instance.StartAsync();
+        }
+        catch
+        {
+            // A manual launch will retry and surface a useful error.
+        }
+    }
+
+    private void OnManualQrChanged(object sender, RoutedEventArgs e)
+    {
+        if (_manualQrLoading) return;
+        bool manual = ManualQrCheckBox.IsChecked == true;
+        Store.Instance.Settings.ManualQrMode = manual;
+        Store.Instance.SaveSettings();
+        HomeAccountCombo.IsEnabled = !manual;
+        ManualModeText.Visibility = manual ? Visibility.Visible : Visibility.Collapsed;
+        App.MainWindow?.ShowInfo(manual
+            ? "手动扫码模式已开启：启动游戏不会自动选号，请在游戏内扫码。"
+            : "手动扫码模式已关闭：启动游戏会登录当前选中的账号。",
+            InfoBarSeverity.Informational);
+        RefreshStatus();
+    }
+
+    private void OnLocateGame(object sender, RoutedEventArgs e)
+    {
+        if (App.MainWindow is null || _gameBusy) return;
+        try
+        {
+            string? path = NativeFileDialog.PickExecutable(
+                WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow));
+            if (string.IsNullOrWhiteSpace(path)) return;
+            if (!string.Equals(Path.GetFileName(path), "dwrg.exe", StringComparison.OrdinalIgnoreCase))
+            {
+                App.MainWindow.ShowInfo("请选择第五人格的 dwrg.exe。", InfoBarSeverity.Warning);
+                return;
+            }
+            Store.Instance.Settings.GamePath = path;
+            Store.Instance.SaveSettings();
+            RefreshStatus();
+            App.MainWindow.ShowInfo("游戏路径已定位。", InfoBarSeverity.Success);
+        }
+        catch (Exception ex)
+        {
+            App.MainWindow?.ShowInfo($"定位游戏失败：{ex.Message}", InfoBarSeverity.Error);
+        }
+    }
+
+    private async void OnDownloadGame(object sender, RoutedEventArgs e)
+    {
+        if (App.MainWindow is null || _gameBusy) return;
+        if (!EngineService.Instance.IsInstalled)
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo("https://id5.163.com/") { UseShellExecute = true });
+                App.MainWindow.ShowInfo("未找到登录引擎，已打开第五人格官方下载页。",
+                    InfoBarSeverity.Informational);
+            }
+            catch (Exception ex)
+            {
+                App.MainWindow.ShowInfo($"无法打开官方下载页：{ex.Message}", InfoBarSeverity.Error);
+            }
+            return;
+        }
+
+        var dialog = new DownloadGameDialog();
+        App.MainWindow.ShowModal(dialog);
+        await dialog.WaitForCloseAsync();
+        App.MainWindow.HideModal();
+        string current = Store.Instance.Settings.GamePath;
+        if (string.IsNullOrWhiteSpace(current) || !File.Exists(current))
+        {
+            string detected = Store.DetectGamePath();
+            if (detected.Length > 0)
+            {
+                Store.Instance.Settings.GamePath = detected;
+                Store.Instance.SaveSettings();
+            }
+        }
+        RefreshStatus();
     }
 
     private void RefreshEngineStatus()
@@ -247,16 +370,26 @@ public sealed partial class HomePage : Page
 
     private void RefreshStatus()
     {
-        if (_launching || _unloaded) return;
+        if (_launching || _gameBusy || _unloaded) return;
 
+        var settings = Store.Instance.Settings;
         bool running = GameLauncher.IsRunning();
+        bool hasGame = !string.IsNullOrWhiteSpace(settings.GamePath) && File.Exists(settings.GamePath);
+
         StatusText.Text = running ? "游戏运行中" : "游戏未运行";
         StatusDot.Fill = new SolidColorBrush(running
             ? Color.FromArgb(255, 111, 197, 140)
             : Color.FromArgb(255, 158, 151, 138));
 
+        DownloadGameButton.Visibility = hasGame ? Visibility.Collapsed : Visibility.Visible;
+        ManualModeText.Visibility = settings.ManualQrMode ? Visibility.Visible : Visibility.Collapsed;
+        HomeAccountCombo.IsEnabled = !settings.ManualQrMode;
+        HomeAccountCombo.PlaceholderText = settings.ManualQrMode
+            ? "手动扫码模式"
+            : _accountOptions.Count > 0 ? "未收藏账号（手动登录）" : "未读取到渠道账号";
+
         var engine = EngineService.Instance;
-        bool engineReady = !Store.Instance.Settings.UseLoginEngine ||
+        bool engineReady = !settings.UseLoginEngine ||
                            (engine.State == EngineState.Ready && engine.IsRunning);
 
         if (_countdown > 0)
@@ -270,6 +403,11 @@ public sealed partial class HomePage : Page
             LaunchButton.IsEnabled = true;
             LaunchText.Text = "关闭游戏";
         }
+        else if (!hasGame)
+        {
+            LaunchButton.IsEnabled = true;
+            LaunchText.Text = "下载 / 定位游戏";
+        }
         else if (!engineReady)
         {
             LaunchButton.IsEnabled = false;
@@ -280,7 +418,7 @@ public sealed partial class HomePage : Page
         else
         {
             LaunchButton.IsEnabled = true;
-            LaunchText.Text = "启动游戏";
+            LaunchText.Text = settings.ManualQrMode ? "手动扫码启动" : "启动游戏";
         }
 
         RefreshEngineStatus();
@@ -294,7 +432,7 @@ public sealed partial class HomePage : Page
 
         // With the toggle off, selecting an account is only a local/UI choice;
         // do not write auto-h55 and silently re-enable automatic login.
-        if (!Store.Instance.Settings.AutoScanLogin)
+        if (!Store.Instance.Settings.AutoScanLogin || Store.Instance.Settings.ManualQrMode)
         {
             Store.Instance.SetDefault(option.Uuid);
             return;
@@ -342,12 +480,45 @@ public sealed partial class HomePage : Page
         }
     }
 
-    private async void OnLaunch(object sender, RoutedEventArgs e)
+    private void SetBusy(bool active, string text)
     {
-        if (GameLauncher.IsRunning())
+        _gameBusy = active;
+        LaunchRing.IsActive = active;
+        LaunchRing.Visibility = active ? Visibility.Visible : Visibility.Collapsed;
+        LaunchIcon.Visibility = active ? Visibility.Collapsed : Visibility.Visible;
+        if (active)
         {
             LaunchButton.IsEnabled = false;
-            LaunchText.Text = "正在关闭游戏…";
+            LaunchText.Text = text;
+        }
+    }
+
+    private async Task WaitForGameWindowAsync()
+    {
+        for (int i = 0; i < 60; i++)
+        {
+            if (_unloaded) return;
+            int pid = GameLauncher.FindProcessId(Store.Instance.Settings.GamePath);
+            if (pid != 0)
+            {
+                try
+                {
+                    using var process = Process.GetProcessById(pid);
+                    if (process.MainWindowHandle != IntPtr.Zero) break;
+                }
+                catch { }
+            }
+            await Task.Delay(250);
+        }
+    }
+
+    private async void OnLaunch(object sender, RoutedEventArgs e)
+    {
+        if (_gameBusy || _launching) return;
+
+        if (GameLauncher.IsRunning())
+        {
+            SetBusy(true, "正在关闭游戏…");
             try
             {
                 await GameLauncher.CloseGameAsync();
@@ -359,6 +530,7 @@ public sealed partial class HomePage : Page
             }
             finally
             {
+                SetBusy(false, "启动游戏");
                 RefreshStatus();
             }
             return;
@@ -367,8 +539,7 @@ public sealed partial class HomePage : Page
         var settings = Store.Instance.Settings;
         if (string.IsNullOrWhiteSpace(settings.GamePath) || !File.Exists(settings.GamePath))
         {
-            App.MainWindow?.ShowInfo("请先在设置中选择 dwrg.exe", InfoBarSeverity.Warning);
-            App.MainWindow?.NavigateTo("settings");
+            OnDownloadGame(sender, e);
             return;
         }
 
@@ -415,32 +586,41 @@ public sealed partial class HomePage : Page
         bool autoLogin = false;
         long loginLogOffset = 0;
         _launching = true;
-        LaunchButton.IsEnabled = false;
+        SetBusy(true, "准备启动…");
 
         try
         {
+            string selectedUuid = settings.ManualQrMode
+                ? ""
+                : (HomeAccountCombo.SelectedItem as HomeAccountOption)?.Uuid ?? "";
+            autoLogin = settings.AutoScanLogin &&
+                        !settings.ManualQrMode &&
+                        !string.IsNullOrWhiteSpace(selectedUuid);
+
             if (settings.UseLoginEngine && EngineService.Instance.IsInstalled)
             {
-                LaunchText.Text = "登录引擎启动中…";
-                App.MainWindow?.ShowInfo("正在启动登录引擎，请稍候…", InfoBarSeverity.Informational);
+                SetBusy(true, "登录服务准备中…");
+                App.MainWindow?.ShowInfo("正在准备登录服务，请稍候…", InfoBarSeverity.Informational);
                 try
                 {
-                    string selectedUuid = (HomeAccountCombo.SelectedItem as HomeAccountOption)?.Uuid ?? "";
+                    var config = await EngineConfigStore.LoadAsync(settings.EngineGameId);
+                    bool needRestart = !EngineService.Instance.IsReady;
+                    if (!needRestart && config.Loaded)
+                    {
+                        bool configAuto = !string.IsNullOrWhiteSpace(config.SelectedUuid);
+                        needRestart = autoLogin
+                            ? !string.Equals(config.SelectedUuid, selectedUuid, StringComparison.OrdinalIgnoreCase)
+                            : configAuto;
+                    }
 
-                    // A starred/selected account is written as auto-h55 so the
-                    // engine logs straight in without showing the built-in
-                    // login window. With no selection, leave it empty so the
-                    // game can show its normal manual login flow.
-                    autoLogin = settings.AutoScanLogin &&
-                                !string.IsNullOrWhiteSpace(selectedUuid);
-
-                    // Stop first so the engine cannot overwrite auto-h55 while
-                    // shutting down; then apply the selection and restart.
-                    if (EngineService.Instance.IsRunning)
-                        await EngineService.Instance.StopAsync();
-                    await EngineConfigStore.ApplyAutoSelectionAsync(
-                        Store.Instance.Settings.EngineGameId, autoLogin, selectedUuid);
-                    await EngineService.Instance.StartAsync();
+                    if (needRestart)
+                    {
+                        if (EngineService.Instance.IsRunning)
+                            await EngineService.Instance.StopAsync();
+                        await EngineConfigStore.ApplyAutoSelectionAsync(
+                            settings.EngineGameId, autoLogin, selectedUuid);
+                        await EngineService.Instance.StartAsync();
+                    }
                     engineUsed = true;
                 }
                 catch (Exception ex)
@@ -450,7 +630,7 @@ public sealed partial class HomePage : Page
                 }
             }
 
-            LaunchText.Text = "正在启动游戏…";
+            SetBusy(true, autoLogin ? "正在登录…" : "正在启动游戏…");
             loginLogOffset = GameLoginGate.CaptureLogOffset();
             bool started = engineUsed
                 ? await EngineService.Instance.LaunchGameAsync(settings.GamePath, settings.GameArgs)
@@ -463,14 +643,19 @@ public sealed partial class HomePage : Page
 
             if (engineUsed && autoLogin)
             {
-                // Hide the built-in login screen while the engine auto-logs in;
-                // restore the game window after success/failure/timeout.
-                _ = GameLoginGate.MinimizeUntilLoggedInAsync(
+                // Hide the game's login window until the engine reports login
+                // success/failure, so the user does not see a login popup.
+                await GameLoginGate.MinimizeUntilLoggedInAsync(
                     settings.GamePath, loginLogOffset, TimeSpan.FromSeconds(25));
             }
+            else
+            {
+                await WaitForGameWindowAsync();
+            }
 
-            App.MainWindow?.ShowInfo(engineUsed ? "登录引擎已就绪，正在启动第五人格…" : "正在启动第五人格…",
+            App.MainWindow?.ShowInfo(engineUsed ? "登录引擎已就绪，第五人格正在启动…" : "第五人格正在启动…",
                 InfoBarSeverity.Success);
+            SetBusy(false, "启动游戏");
 
             if (settings.AutoClose && !engineUsed)
             {
@@ -482,24 +667,9 @@ public sealed partial class HomePage : Page
                 };
                 _closeTimer.Start();
             }
-            else if (engineUsed)
-            {
-                if (settings.AutoMinimize)
-                {
-                    var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(700) };
-                    timer.Tick += (_, _) =>
-                    {
-                        timer.Stop();
-                        App.MainWindow?.Minimize();
-                    };
-                    timer.Start();
-                }
-                App.MainWindow?.ShowInfo("登录引擎仍在运行；进入游戏并完成登录后，再关闭启动器。",
-                    InfoBarSeverity.Informational);
-            }
             else if (settings.AutoMinimize)
             {
-                var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
+                var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(650) };
                 timer.Tick += (_, _) =>
                 {
                     timer.Stop();
@@ -515,8 +685,8 @@ public sealed partial class HomePage : Page
         finally
         {
             _launching = false;
+            if (_gameBusy) SetBusy(false, "启动游戏");
             LaunchButton.IsEnabled = true;
-            LaunchText.Text = "启动游戏";
             RefreshStatus();
         }
     }

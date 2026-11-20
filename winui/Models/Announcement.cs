@@ -18,4 +18,7 @@ public sealed class Announcement
 
     [JsonPropertyName("url")]
     public string Url { get; set; } = "";
+
+    [JsonPropertyName("image")]
+    public string ImageUrl { get; set; } = "";
 }

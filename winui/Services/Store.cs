@@ -59,6 +59,17 @@ public sealed class Store
             SaveSettings();
         }
 
+        // Version 4: manual QR mode and engine prewarm are opt-in/out
+        // independently of the existing auto-login setting.
+        if (Settings.SettingsSchema < 4)
+        {
+            Settings.AutoScanLogin = true;
+            Settings.AutoStartEngine = true;
+            Settings.ManualQrMode = false;
+            Settings.SettingsSchema = 4;
+            SaveSettings();
+        }
+
         if (Settings.Theme is < 0 or > 2) Settings.Theme = 0;
         if (Settings.LaunchDelay is < 0 or > 30) Settings.LaunchDelay = Math.Clamp(Settings.LaunchDelay, 0, 30);
         if (Settings.WindowW < 900) Settings.WindowW = 1268;

@@ -5,13 +5,14 @@ using System.Text;
 namespace IdvLauncher.Services;
 
 /// <summary>
-/// Keeps the game's built-in login window out of sight while the engine
-/// performs an automatic account login. On success/failure the window is
-/// restored; if the engine never reports a result it is restored on timeout.
+/// Hides the game's built-in login window while the engine performs an
+/// automatic account login. On success/failure the window is restored; if the
+/// engine never reports a result it is restored on timeout. Hiding (rather
+/// than minimizing) avoids a visible login popup in the taskbar.
 /// </summary>
 public static class GameLoginGate
 {
-    private const int SW_MINIMIZE = 6;
+    private const int SW_HIDE = 0;
     private const int SW_RESTORE = 9;
 
     [DllImport("user32.dll")]
@@ -51,7 +52,7 @@ public static class GameLoginGate
                         IntPtr window = process.MainWindowHandle;
                         if (window != IntPtr.Zero && window != minimizedWindow)
                         {
-                            if (ShowWindow(window, SW_MINIMIZE))
+                            if (ShowWindow(window, SW_HIDE))
                                 minimizedWindow = window;
                         }
                     }

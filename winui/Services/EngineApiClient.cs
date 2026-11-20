@@ -168,6 +168,14 @@ public sealed class EngineApiClient
         return ParseAction(text, response.IsSuccessStatusCode);
     }
 
+    public async Task<ApiActionResult> SwitchAccountAsync(string uuid, string gameId)
+    {
+        using var response = await _http.GetAsync(
+            $"_idv-login/switch?uuid={Uri.EscapeDataString(uuid)}&game_id={Uri.EscapeDataString(gameId)}");
+        string text = await response.Content.ReadAsStringAsync();
+        return ParseAction(text, response.IsSuccessStatusCode);
+    }
+
     public async Task<ApiActionResult> StartGameAsync(string gameId)
     {
         using var response = await _http.GetAsync(

@@ -84,6 +84,8 @@ public sealed partial class EnginePage : Page
             LoginDelayBox.Value = config.LoginDelay;
             AutoCloseToggle.IsOn = config.AutoClose;
             AutoScanToggle.IsOn = settings.AutoScanLogin;
+            AutoStartEngineToggle.IsOn = settings.AutoStartEngine;
+            GameArgsBox.Text = settings.GameArgs;
             GamePathBox.Text = !string.IsNullOrWhiteSpace(config.GamePath)
                 ? config.GamePath
                 : settings.GamePath;
@@ -186,6 +188,8 @@ public sealed partial class EnginePage : Page
     {
         var settings = Store.Instance.Settings;
         settings.GamePath = GamePathBox.Text.Trim();
+        settings.GameArgs = GameArgsBox.Text.Trim();
+        settings.AutoStartEngine = AutoStartEngineToggle.IsOn;
         Store.Instance.SaveSettings();
     }
 
@@ -254,6 +258,39 @@ public sealed partial class EnginePage : Page
     private void OnOpenAccounts(object sender, RoutedEventArgs e)
     {
         App.MainWindow?.NavigateTo("accounts");
+    }
+
+    private void OnBrowseGame(object sender, RoutedEventArgs e)
+    {
+        if (App.MainWindow is null) return;
+        try
+        {
+            string? path = NativeFileDialog.PickExecutable(
+                WindowNative.GetWindowHandle(App.MainWindow));
+            if (string.IsNullOrWhiteSpace(path)) return;
+            GamePathBox.Text = path;
+            Store.Instance.Settings.GamePath = path;
+            Store.Instance.SaveSettings();
+            ShowInfo("游戏路径已更新。", InfoBarSeverity.Success);
+        }
+        catch (Exception ex)
+        {
+            ShowInfo($"选择游戏失败：{ex.Message}", InfoBarSeverity.Error);
+        }
+    }
+
+    private void OnDetectGame(object sender, RoutedEventArgs e)
+    {
+        string path = Store.DetectGamePath();
+        if (path.Length == 0)
+        {
+            ShowInfo("没有自动检测到 dwrg.exe，请点「浏览」手动定位。", InfoBarSeverity.Warning);
+            return;
+        }
+        GamePathBox.Text = path;
+        Store.Instance.Settings.GamePath = path;
+        Store.Instance.SaveSettings();
+        ShowInfo("已检测到游戏路径。", InfoBarSeverity.Success);
     }
 
     private void OnRefreshLog(object sender, RoutedEventArgs e)

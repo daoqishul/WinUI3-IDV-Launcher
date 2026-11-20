@@ -8,15 +8,6 @@
 
 > 非官方工具，与网易 / 第五人格官方无关。使用前请阅读免责声明。
 
-
-
-怎么登录操作：
->方法A：打开后点开“登录引擎“打开”自动扫码登录“随后前往”账号管理点击“添加渠道账号“进行登录，登录好后右边有个星星的标志点亮，启动游戏点开扫码界面可以自动扫了
-> 方法B：直接开启游戏应该会有内置的登录窗口出现扫码一次后面都可以手动点击登录了
-
-
-
-
 ## 功能
 
 - 渠道账号管理、搜索、收藏
@@ -82,7 +73,7 @@ dotnet build .\WinUI3-IDV-Launcher.sln -c Release -p:Platform=x64
 
 ```text
 dist\
-IDVLauncher-WinUI3-v1.0.4-win64.zip
+IDVLauncher-WinUI3-v1.0.5-win64.zip
 ```
 
 ## 项目结构
@@ -124,7 +115,7 @@ build.ps1               构建脚本
 & "C:\Program Files\Inno Setup 7\ISCC.exe" .\installer.iss
 ```
 
-输出：`installer\IDVLauncher-Setup-v1.0.4.exe`
+输出：`installer\IDVLauncher-Setup-v1.0.5.exe`
 
 ## 参与贡献
 

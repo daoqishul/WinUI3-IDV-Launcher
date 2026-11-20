@@ -6,7 +6,7 @@ using IdvLauncher.Models;
 
 namespace IdvLauncher.Services;
 
-public sealed record OfficialNewsResult(IReadOnlyList<Announcement> Items, bool FromNetwork);
+public sealed record OfficialNewsResult(IReadOnlyList<Announcement> Items, bool FromNetwork, string BannerUrl = "");
 
 public static class OfficialNewsService
 {
@@ -21,6 +21,9 @@ public static class OfficialNewsService
     private static readonly Regex ItemRegex = new(
         "<a\\s+href=\"(?<url>[^\"]*?/news/(?:official|update)/[^\"]+\\.html)\"[^>]*class=\"item\"[^>]*>\\s*<p><i>(?<tag>.*?)</i>\\s*(?<title>.*?)</p>\\s*<span>(?<date>[^<]+)</span>",
         RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    private static readonly Regex ImageRegex = new(
+        "<img[^>]+src=\"(?<url>[^\"]+)\"",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     static OfficialNewsService()
     {
@@ -32,10 +35,12 @@ public static class OfficialNewsService
         try
         {
             var all = new List<Announcement>();
+            string banner = "";
             foreach (string url in new[] { SourceUrl, NewsUrl })
             {
-                var items = await FetchPageAsync(url).ConfigureAwait(false);
+                var (items, pageBanner) = await FetchPageAsync(url).ConfigureAwait(false);
                 all.AddRange(items);
+                if (banner.Length == 0) banner = pageBanner;
             }
 
             var merged = all
@@ -56,7 +61,7 @@ public static class OfficialNewsService
                         new UTF8Encoding(false)).ConfigureAwait(false);
                 }
                 catch { }
-                return new OfficialNewsResult(merged, true);
+                return new OfficialNewsResult(merged, true, banner);
             }
         }
         catch
@@ -79,7 +84,7 @@ public static class OfficialNewsService
         return new OfficialNewsResult(Store.Instance.Announcements, false);
     }
 
-    private static async Task<List<Announcement>> FetchPageAsync(string url)
+    private static async Task<(List<Announcement> Items, string Banner)> FetchPageAsync(string url)
     {
         byte[] bytes = await Http.GetByteArrayAsync(url).ConfigureAwait(false);
         string html;
@@ -90,6 +95,20 @@ public static class OfficialNewsService
         catch (DecoderFallbackException)
         {
             html = Encoding.GetEncoding("gb18030").GetString(bytes);
+        }
+
+        string banner = "";
+        foreach (Match image in ImageRegex.Matches(html))
+        {
+            string raw = WebUtility.HtmlDecode(image.Groups["url"].Value).Trim();
+            if (raw.Length == 0 || raw.Contains("logo", StringComparison.OrdinalIgnoreCase) ||
+                raw.Contains("icon", StringComparison.OrdinalIgnoreCase)) continue;
+            if (raw.StartsWith("//", StringComparison.Ordinal)) raw = "https:" + raw;
+            else if (raw.StartsWith("/", StringComparison.Ordinal)) raw = "https://id5.163.com" + raw;
+            if (!raw.StartsWith("http", StringComparison.OrdinalIgnoreCase)) continue;
+            banner = raw;
+            if (raw.Contains("top-nr", StringComparison.OrdinalIgnoreCase) ||
+                raw.Contains("news", StringComparison.OrdinalIgnoreCase)) break;
         }
 
         var result = new List<Announcement>();
@@ -114,9 +133,10 @@ public static class OfficialNewsService
                 Summary = "第五人格官方公告",
                 Tag = tag.Length == 0 ? "公告" : tag,
                 Url = link,
+                ImageUrl = banner,
             });
         }
-        return result;
+        return (result, banner);
     }
 
     private static HttpClient CreateClient()

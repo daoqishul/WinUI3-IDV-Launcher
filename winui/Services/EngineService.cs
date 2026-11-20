@@ -117,7 +117,7 @@ public sealed class EngineService
 
                 // The HTTP listener can be ready slightly before the log line
                 // is flushed; checking it makes startup feel faster.
-                if (ticks % 4 == 0 &&
+                if (ticks % 2 == 0 &&
                     await EngineApiClient.Instance.HealthAsync().ConfigureAwait(false))
                 {
                     SetState(EngineState.Ready, "登录引擎已就绪");
@@ -145,8 +145,15 @@ public sealed class EngineService
             throw new EngineException("切换渠道账号需要管理员权限，请以管理员身份运行启动器。");
         if (!IsInstalled)
             throw new EngineException("没有找到原版 IDV-Login 引擎，请先在登录引擎页指定目录。");
+
+        // If the game is already sitting on its login screen, ask the running
+        // engine to switch accounts in place instead of launching a second
+        // game process.
         if (GameLauncher.IsRunning())
-            throw new EngineException("游戏正在运行。请先关闭第五人格，再点击「登录账号」切换渠道。");
+        {
+            await SwitchAccountAsync(uuid).ConfigureAwait(false);
+            return;
+        }
 
         var config = await EngineConfigStore.LoadAsync(Store.Instance.Settings.EngineGameId);
         if (!config.Loaded)
@@ -173,6 +180,33 @@ public sealed class EngineService
 
         await StartAsync().ConfigureAwait(false);
         await LaunchGameAsync(gamePath, Store.Instance.Settings.GameArgs).ConfigureAwait(false);
+    }
+
+    public async Task SwitchAccountAsync(string uuid)
+    {
+        if (!IsReady)
+            await StartAsync().ConfigureAwait(false);
+        var result = await EngineApiClient.Instance
+            .SwitchAccountAsync(uuid, Store.Instance.Settings.EngineGameId)
+            .ConfigureAwait(false);
+        if (!result.Success)
+            throw new EngineException(string.IsNullOrWhiteSpace(result.Error)
+                ? "切换账号失败，请确认游戏仍在登录界面。"
+                : result.Error);
+
+        Store.Instance.SetDefault(uuid);
+        var config = await EngineConfigStore.LoadAsync(Store.Instance.Settings.EngineGameId)
+            .ConfigureAwait(false);
+        if (config.Loaded)
+        {
+            await EngineConfigStore.SaveAsync(new EngineConfigDraft(
+                config.GameId,
+                config.GamePath,
+                config.ProxyMode,
+                config.LoginDelay,
+                config.AutoClose,
+                uuid)).ConfigureAwait(false);
+        }
     }
 
     public async Task StopAsync()

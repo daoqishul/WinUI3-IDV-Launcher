@@ -74,29 +74,28 @@
                     </Grid>
                 </Border>
 
-                <Grid ColumnSpacing="16">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1.08*" />
-                        <ColumnDefinition Width="1*" />
-                    </Grid.ColumnDefinitions>
+                <Border Style="{StaticResource CardStyle}">
+                    <StackPanel Spacing="12">
+                        <Grid ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE713;" FontSize="16" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                                <TextBlock Text="登录配置" Style="{StaticResource CardTitleStyle}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
+                                <Button Content="保存配置" Click="OnSaveConfig" />
+                            </StackPanel>
+                        </Grid>
+                        <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
 
-                    <Border Style="{StaticResource CardStyle}">
-                        <StackPanel Spacing="12">
-                            <Grid ColumnSpacing="8">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="&#xE713;" FontSize="16" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
-                                    <TextBlock Text="登录配置" Style="{StaticResource CardTitleStyle}" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
-                                    <Button Content="保存配置" Click="OnSaveConfig" />
-                                </StackPanel>
-                            </Grid>
-                            <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
-
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
                             <ComboBox x:Name="ProxyModeCombo"
                                       Header="代理模式"
                                       HorizontalAlignment="Stretch">
@@ -104,94 +103,112 @@
                                 <ComboBoxItem Content="进程代理（只影响启动的游戏）" Tag="process" />
                                 <ComboBoxItem Content="全局代理（影响整台电脑）" Tag="global" />
                             </ComboBox>
-
                             <ComboBox x:Name="AccountCombo"
+                                      Grid.Column="1"
                                       Header="默认渠道账号"
                                       HorizontalAlignment="Stretch"
                                       DisplayMemberPath="Display"
                                       SelectedValuePath="Uuid"
                                       PlaceholderText="读取中…" />
+                        </Grid>
 
-                            <Grid ColumnSpacing="12">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel>
-                                    <TextBlock Text="登录延迟" Style="{StaticResource SettingLabelStyle}" />
-                                    <TextBlock Text="游戏请求到达后等待多少秒再填入账号"
-                                               Style="{StaticResource SettingDescriptionStyle}" />
-                                </StackPanel>
-                                <NumberBox x:Name="LoginDelayBox"
-                                           Grid.Column="1"
-                                           Width="120"
-                                           Minimum="0"
-                                           Maximum="30"
-                                           SmallChange="1"
-                                           SpinButtonPlacementMode="Compact"
-                                           VerticalAlignment="Center" />
-                            </Grid>
-
-                            <Grid ColumnSpacing="12">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel>
-                                    <TextBlock Text="登录后自动关闭引擎" Style="{StaticResource SettingLabelStyle}" />
-                                    <TextBlock Text="进入游戏后自动停止并清理 DNS/代理"
-                                               Style="{StaticResource SettingDescriptionStyle}" />
-                                </StackPanel>
-                                <ToggleSwitch x:Name="AutoCloseToggle"
-                                              Grid.Column="1"
-                                              VerticalAlignment="Center"
-                                              OnContent=""
-                                              OffContent="" />
-                            </Grid>
-
-                            <Grid ColumnSpacing="12">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel>
-                                    <TextBlock Text="自动扫码登录" Style="{StaticResource SettingLabelStyle}" />
-                                    <TextBlock Text="开启后自动登录当前账号；关闭后进入游戏内置登录界面手动选号"
-                                               Style="{StaticResource SettingDescriptionStyle}" />
-                                </StackPanel>
-                                <ToggleSwitch x:Name="AutoScanToggle"
-                                              Grid.Column="1"
-                                              VerticalAlignment="Center"
-                                              OnContent=""
-                                              OffContent=""
-                                              Toggled="OnAutoScanToggled" />
-                            </Grid>
-
-                            <TextBlock x:Name="RestartNeededText"
-                                       Text="配置已保存；下次启动游戏时自动应用。"
-                                       Foreground="{ThemeResource AccentFillColorDefaultBrush}"
-                                       FontSize="11.5"
-                                       Visibility="Collapsed" />
-                        </StackPanel>
-                    </Border>
-
-                    <Border Grid.Column="1" Style="{StaticResource CardStyle}">
-                        <StackPanel Spacing="12">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon Glyph="&#xE7FC;" FontSize="16" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
-                                <TextBlock Text="游戏与启动" Style="{StaticResource CardTitleStyle}" />
-                            </StackPanel>
-                            <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
-
+                        <Grid ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
                             <TextBox x:Name="GamePathBox"
-                                     Header="游戏路径（在设置中修改）"
+                                     Header="游戏路径"
                                      IsReadOnly="True"
                                      PlaceholderText="D:\dwrg\dwrg.exe" />
+                            <Button Grid.Column="1" Content="浏览" Click="OnBrowseGame" VerticalAlignment="Bottom" />
+                            <Button Grid.Column="2" Content="检测" Click="OnDetectGame" VerticalAlignment="Bottom" />
+                        </Grid>
 
+                        <TextBox x:Name="GameArgsBox"
+                                 Header="启动参数"
+                                 PlaceholderText="--start_from_launcher=1" />
 
-                        </StackPanel>
-                    </Border>
-                </Grid>
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="登录延迟" Style="{StaticResource SettingLabelStyle}" />
+                                <TextBlock Text="游戏请求到达后等待多少秒再填入账号"
+                                           Style="{StaticResource SettingDescriptionStyle}" />
+                            </StackPanel>
+                            <NumberBox x:Name="LoginDelayBox"
+                                       Grid.Column="1"
+                                       Width="120"
+                                       Minimum="0"
+                                       Maximum="30"
+                                       SmallChange="1"
+                                       SpinButtonPlacementMode="Compact"
+                                       VerticalAlignment="Center" />
+                        </Grid>
+
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="登录后自动关闭引擎" Style="{StaticResource SettingLabelStyle}" />
+                                <TextBlock Text="进入游戏后自动停止并清理 DNS/代理"
+                                           Style="{StaticResource SettingDescriptionStyle}" />
+                            </StackPanel>
+                            <ToggleSwitch x:Name="AutoCloseToggle"
+                                          Grid.Column="1"
+                                          VerticalAlignment="Center"
+                                          OnContent=""
+                                          OffContent="" />
+                        </Grid>
+
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="自动扫码登录" Style="{StaticResource SettingLabelStyle}" />
+                                <TextBlock Text="开启后自动登录当前账号；关闭后进入游戏内置登录界面手动选号"
+                                           Style="{StaticResource SettingDescriptionStyle}" />
+                            </StackPanel>
+                            <ToggleSwitch x:Name="AutoScanToggle"
+                                          Grid.Column="1"
+                                          VerticalAlignment="Center"
+                                          OnContent=""
+                                          OffContent=""
+                                          Toggled="OnAutoScanToggled" />
+                        </Grid>
+
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="启动器启动时预热登录引擎" Style="{StaticResource SettingLabelStyle}" />
+                                <TextBlock Text="提前启动登录服务，减少点击启动后的等待"
+                                           Style="{StaticResource SettingDescriptionStyle}" />
+                            </StackPanel>
+                            <ToggleSwitch x:Name="AutoStartEngineToggle"
+                                          Grid.Column="1"
+                                          VerticalAlignment="Center"
+                                          OnContent=""
+                                          OffContent="" />
+                        </Grid>
+
+                        <TextBlock x:Name="RestartNeededText"
+                                   Text="配置已保存；下次启动游戏时自动应用。"
+                                   Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+                                   FontSize="11.5"
+                                   Visibility="Collapsed" />
+                    </StackPanel>
+                </Border>
 
                 <Border Style="{StaticResource CardStyle}">
                     <StackPanel Spacing="10">

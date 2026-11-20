@@ -390,12 +390,12 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
-                                    <TextBlock Text="下载游戏" Style="{StaticResource SettingLabelStyle}" />
-                                    <TextBlock Text="打开 PC 互通版下载 / 安装说明页面"
+                                    <TextBlock Text="下载不同版本的第五人格" Style="{StaticResource SettingLabelStyle}" />
+                                    <TextBlock Text="选择官方或渠道版本，由登录引擎多线程下载"
                                                Style="{StaticResource SettingDescriptionStyle}" />
                                 </StackPanel>
                                 <Button Grid.Column="1"
-                                        Content="打开下载页"
+                                        Content="选择版本"
                                         VerticalAlignment="Center"
                                         Click="OnDownloadGame" />
                             </Grid>
@@ -512,7 +512,7 @@
                                 </Border>
                                 <StackPanel VerticalAlignment="Center" Spacing="2">
                                     <TextBlock Text="IDV 启动器" FontSize="15" FontWeight="SemiBold" />
-                                    <TextBlock Text="v1.0.4 · WinUI 3 / .NET 8"
+                                    <TextBlock Text="v1.0.5 · WinUI 3 / .NET 8"
                                                FontSize="10.5"
                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                 </StackPanel>
