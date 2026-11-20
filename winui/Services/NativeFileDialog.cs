@@ -11,8 +11,8 @@ public static class NativeFileDialog
         public int lStructSize;
         public IntPtr hwndOwner;
         public IntPtr hInstance;
-        public string lpstrFilter;
-        public string lpstrCustomFilter;
+        public IntPtr lpstrFilter;
+        public IntPtr lpstrCustomFilter;
         public int nMaxCustFilter;
         public int nFilterIndex;
         public IntPtr lpstrFile;
@@ -39,7 +39,53 @@ public static class NativeFileDialog
     private const int OFN_FILEMUSTEXIST = 0x00001000;
     private const int OFN_PATHMUSTEXIST = 0x00000800;
     private const int OFN_NOCHANGEDIR = 0x00000008;
+    private const int OFN_EXPLORER = 0x00080000;
     private const int BufferChars = 2048;
+
+    public static string? PickJson(IntPtr owner) =>
+        PickFile(owner, "选择 pc_key_setting_data.json",
+            "按键配置 (*.json)\0*.json\0所有文件 (*.*)\0*.*\0\0", "json");
+
+    public static string? PickExecutable(IntPtr owner) =>
+        PickFile(owner, "选择第五人格 dwrg.exe",
+            "游戏程序 (*.exe)\0*.exe\0所有文件 (*.*)\0*.*\0\0", "exe");
+
+    private static string? PickFile(IntPtr owner, string title, string filter, string extension)
+    {
+        IntPtr fileBuffer = Marshal.AllocHGlobal(BufferChars * sizeof(char));
+        byte[] filterBytes = Encoding.Unicode.GetBytes(filter);
+        IntPtr filterBuffer = Marshal.AllocHGlobal(filterBytes.Length);
+        try
+        {
+            for (int i = 0; i < BufferChars; i++)
+                Marshal.WriteInt16(fileBuffer, i * sizeof(char), 0);
+            Marshal.Copy(filterBytes, 0, filterBuffer, filterBytes.Length);
+
+            var dialog = new OPENFILENAME
+            {
+                lStructSize = Marshal.SizeOf<OPENFILENAME>(),
+                hwndOwner = owner,
+                lpstrFilter = filterBuffer,
+                nFilterIndex = 1,
+                lpstrFile = fileBuffer,
+                nMaxFile = BufferChars,
+                lpstrFileTitle = IntPtr.Zero,
+                nMaxFileTitle = 0,
+                lpstrTitle = title,
+                Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR | OFN_EXPLORER,
+                lpstrDefExt = extension,
+            };
+
+            return GetOpenFileNameW(ref dialog)
+                ? Marshal.PtrToStringUni(fileBuffer)
+                : null;
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(fileBuffer);
+            Marshal.FreeHGlobal(filterBuffer);
+        }
+    }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     private struct BROWSEINFO
@@ -96,45 +142,6 @@ public static class NativeFileDialog
         finally
         {
             Marshal.FreeHGlobal(displayName);
-        }
-    }
-
-    public static string? PickJson(IntPtr owner) =>
-        PickFile(owner, "选择 pc_key_setting_data.json",
-            "按键配置 (*.json)\0*.json\0所有文件 (*.*)\0*.*\0\0", "json");
-
-    public static string? PickExecutable(IntPtr owner) =>
-        PickFile(owner, "选择第五人格 dwrg.exe",
-            "游戏程序 (*.exe)\0*.exe\0所有文件 (*.*)\0*.*\0\0", "exe");
-
-    private static string? PickFile(IntPtr owner, string title, string filter, string extension)
-    {
-        IntPtr buffer = Marshal.AllocHGlobal(BufferChars * sizeof(char));
-        try
-        {
-            for (int i = 0; i < BufferChars; i++)
-                Marshal.WriteInt16(buffer, i * sizeof(char), 0);
-
-            var dialog = new OPENFILENAME
-            {
-                lStructSize = Marshal.SizeOf<OPENFILENAME>(),
-                hwndOwner = owner,
-                lpstrFilter = filter,
-                nFilterIndex = 1,
-                lpstrFile = buffer,
-                nMaxFile = BufferChars,
-                lpstrTitle = title,
-                Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
-                lpstrDefExt = extension,
-            };
-
-            return GetOpenFileNameW(ref dialog)
-                ? Marshal.PtrToStringUni(buffer)
-                : null;
-        }
-        finally
-        {
-            Marshal.FreeHGlobal(buffer);
         }
     }
 }

@@ -4,9 +4,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
-using Windows.Storage.Pickers;
 using Windows.UI;
-using WinRT.Interop;
 
 namespace IdvLauncher.Pages;
 
@@ -245,17 +243,20 @@ public sealed partial class SettingsPage : Page
             : fallback;
     }
 
-    private async void OnBrowseGame(object sender, RoutedEventArgs e)
+    private void OnBrowseGame(object sender, RoutedEventArgs e)
     {
         if (App.MainWindow is null) return;
         try
         {
-            var picker = new FileOpenPicker();
-            InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(App.MainWindow));
-            picker.FileTypeFilter.Add(".exe");
-            var file = await picker.PickSingleFileAsync();
-            if (file is null) return;
-            Store.Instance.Settings.GamePath = file.Path;
+            string? path = NativeFileDialog.PickExecutable(
+                WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow));
+            if (string.IsNullOrWhiteSpace(path)) return;
+            if (!string.Equals(Path.GetFileName(path), "dwrg.exe", StringComparison.OrdinalIgnoreCase))
+            {
+                App.MainWindow.ShowInfo("请选择第五人格的 dwrg.exe。", InfoBarSeverity.Warning);
+                return;
+            }
+            Store.Instance.Settings.GamePath = path;
             Store.Instance.SaveSettings();
             LoadState();
             App.MainWindow.ShowInfo("游戏路径已更新", InfoBarSeverity.Success);
@@ -263,7 +264,7 @@ public sealed partial class SettingsPage : Page
         catch (Exception ex)
         {
             App.TryLog(ex.ToString());
-            App.MainWindow.ShowInfo("无法打开文件选择器", InfoBarSeverity.Error);
+            App.MainWindow.ShowInfo($"无法打开文件选择器：{ex.Message}", InfoBarSeverity.Error);
         }
     }
 
